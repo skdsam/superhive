@@ -1,10 +1,25 @@
-export default (f, p, render, { field, textarea, addCountControls, ensureLength }) => {
-    addCountControls(f, 'Versions', p.items.length, (n)=>{
-      p.items = ensureLength(p.items, n, ()=>({v:'1.0.x', notes:['Note']}));
-      render();
-    });
-    p.items.forEach((it,idx)=>{
-      f.appendChild(field(`Version ${idx+1}`,'text',it.v,(v)=>{ it.v=v; render(); }));
-      f.appendChild(textarea(`Notes ${idx+1}`,(it.notes||[]).join('\n'),(v)=>{ it.notes=v.split(/\n+/).filter(Boolean); render(); }));
-    });
-  };
+export default (f, p, render, { field, arrayEditor }) => {
+  f.appendChild(field('Main Title', 'text', p.title, (v) => { p.title = v; render(); }));
+  f.appendChild(field('Badge Text', 'text', p.badgeText, (v) => { p.badgeText = v; render(); }));
+  
+  f.appendChild(field('Badge Background', 'text', p.badgeBgColor, (v) => { p.badgeBgColor = v; render(); }));
+  f.appendChild(field('Badge Text Color', 'text', p.badgeTextColor, (v) => { p.badgeTextColor = v; render(); }));
+  f.appendChild(field('Title Color', 'text', p.titleColor, (v) => { p.titleColor = v; render(); }));
+  f.appendChild(field('Version Color', 'text', p.versionColor, (v) => { p.versionColor = v; render(); }));
+  f.appendChild(field('Notes Color', 'text', p.notesColor, (v) => { p.notesColor = v; render(); }));
+  
+  // Transform notes from array to newline string for the editor
+  const editorItems = (p.items || []).map(it => ({
+    ...it,
+    notes: Array.isArray(it.notes) ? it.notes.join('\n') : (it.notes || '')
+  }));
+
+  f.appendChild(arrayEditor('Update Versions', ['v', 'notes'], editorItems, (a) => { 
+    p.items = a.map(it => ({
+      ...it,
+      // Transform notes from newline string back to list for the block
+      notes: typeof it.notes === 'string' ? it.notes.split(/\n+/).filter(Boolean) : (it.notes || [])
+    }));
+    render(); 
+  }));
+};
