@@ -57,14 +57,13 @@ async function initBlocks() {
         const mod = await import(`./blocks/${name}.js`);
         Blocks[name] = mod.default;
         
-        // Try to load separate UI module
         try {
           const uiMod = await import(`./block_UI/${name}_UI.js`);
           if (uiMod.default) {
             Blocks[name].inspector = uiMod.default;
           }
         } catch (e) {
-          // If no separate UI file, it might still have internal inspector or none
+          // No separate UI
         }
       } catch (e) {
         console.error(`Failed to load block: ${name}`, e);
