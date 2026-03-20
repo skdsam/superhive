@@ -713,9 +713,21 @@ function closeModal(id){ $('#'+id).style.display='none'; }
 
 // Shortcut listeners
 window.addEventListener('keydown', (e)=>{
-  if(e.key==='Delete' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { $('#btn-del').click(); }
+  if(e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
+  if(e.key==='Delete') { $('#btn-del').click(); }
   if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s') { e.preventDefault(); $('#btn-save').click(); }
+  if(e.key.toLowerCase()==='l') { $('#btn-toggle-left').click(); }
+  if(e.key.toLowerCase()==='r') { $('#btn-toggle-right').click(); }
 });
+
+$('#btn-toggle-left').onclick = () => {
+  $('.app').classList.toggle('left-hidden');
+  $('#btn-toggle-left').classList.toggle('active');
+};
+$('#btn-toggle-right').onclick = () => {
+  $('.app').classList.toggle('right-hidden');
+  $('#btn-toggle-right').classList.toggle('active');
+};
 
 // Tab switching
 $('#tab-lib').onclick = () => {

@@ -18,9 +18,25 @@ body {
   margin: 0; background: var(--bg);
   color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
 }
-.app { display: grid; grid-template-columns: 280px 1fr 340px; gap: 0; height: 100vh; }
-.col { overflow: auto; }
-.left, .right { background: var(--panel); border-right: 1px solid var(--border); border-left: 1px solid var(--border); }
+.app { 
+  display: grid; 
+  grid-template-columns: 280px 1fr 340px; 
+  gap: 0; 
+  height: 100vh; 
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.app.left-hidden { grid-template-columns: 0px 1fr 340px; }
+.app.right-hidden { grid-template-columns: 280px 1fr 0px; }
+.app.left-hidden.right-hidden { grid-template-columns: 0px 1fr 0px; }
+
+.col { overflow: auto; min-width: 0; }
+.left, .right { 
+  background: var(--panel); 
+  border-right: 1px solid var(--border); 
+  border-left: 1px solid var(--border); 
+  transition: opacity 0.2s;
+}
+.left-hidden .left, .right-hidden .right { opacity: 0; pointer-events: none; }
 header.appbar {
   grid-column: 1 / 4;
   background: #ffffff;
@@ -40,6 +56,14 @@ header.appbar .btn {
 header.appbar .btn:hover { background: var(--panel2); }
 header.appbar #btn-global-addons { border-color: var(--accent) !important; color: var(--accent) !important; }
 header.appbar #btn-global-addons:hover { background: #eff6ff; }
+
+.toggle-btn {
+  background: transparent; border: 1px solid var(--border); border-radius: 6px;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted); transition: all 0.2s;
+}
+.toggle-btn:hover { background: var(--panel2); color: var(--text); border-color: var(--accent); }
+.toggle-btn.active { background: #eff6ff; color: var(--accent); border-color: var(--accent); }
 
 /* Slim Scrollbars */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
