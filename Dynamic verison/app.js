@@ -1,0 +1,816 @@
+/* =========================
+   SuperHive Builder (Dynamic Version)
+   ========================= */
+
+const $  = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+/* -------------------------
+   Global Definitions
+------------------------- */
+const defaultGlobalAddons = [
+  { href:'https://superhivemarket.com/products/collection-compactor', img:'https://assets.superhivemarket.com/cache/0cd9ee6fc0d0d7194b2f202c5ac8b86b.JPG', title:'Collection Compactor', sub:'Hide/show collections, compact the Outliner, search hidden items.', tags:['Outliner','Blender 3.6–4.5'] },
+  { href:'https://superhivemarket.com/products/isometric-room-generator', img:'https://assets.superhivemarket.com/cache/af9e9b8a5b31fb6b079b116b78f1ccd5.png', title:'IRG — Isometric Room Generator', sub:'Generate square/round rooms + windows in seconds.', tags:['Isometric','Windows'] },
+  { href:'https://superhivemarket.com/products/key-capture', img:'https://assets.superhivemarket.com/cache/f191b28230006e8ecfecb21dc44d0bfe.gif', title:'Key Capture', sub:'Show keys & mouse live in the viewport for tutorials.', tags:['Teaching','HUD'] },
+  { href:'https://superhivemarket.com/products/maze-maker', img:'https://assets.superhivemarket.com/cache/5ab8e4f8c67678fe4eee5c26a0077211.png', title:'Maze Maker', sub:'Procedural mazes, rooms, loop probability + BFS path.', tags:['Procedural','Path'] },
+];
+
+window.globalAddonsRegistry = [];
+try {
+  const savedGlobal = localStorage.getItem('sh_global_addons');
+  window.globalAddonsRegistry = savedGlobal ? JSON.parse(savedGlobal) : defaultGlobalAddons;
+} catch(e) {
+  window.globalAddonsRegistry = defaultGlobalAddons;
+}
+
+function saveGlobalAddonsRegistry() {
+  localStorage.setItem('sh_global_addons', JSON.stringify(window.globalAddonsRegistry));
+  render(); 
+}
+
+/* -------------------------
+   State
+------------------------- */
+const state = {
+  blocks: [],
+  selectedId: null,
+  drag: {
+    sourceId: null,
+    newType: null,
+    overId: null,
+    where: 'before'
+  }
+};
+
+const uid = () => 'b_' + Math.random().toString(36).slice(2, 9);
+
+/* -------------------------
+   Block Registry & Loader
+------------------------- */
+let Blocks = {};
+
+async function initBlocks() {
+  try {
+    const res = await fetch('blocks.json');
+    const blockNames = await res.json();
+    
+    const loadPromises = blockNames.map(async name => {
+      try {
+        const mod = await import(`./blocks/${name}.js`);
+        Blocks[name] = mod.default;
+      } catch (e) {
+        console.error(`Failed to load block: ${name}`, e);
+      }
+    });
+    
+    await Promise.all(loadPromises);
+    console.log('All blocks loaded:', Object.keys(Blocks));
+    
+    buildLibrary();
+    if(!tryRestore()) loadDefault();
+  } catch (e) {
+    console.error('Failed to initialize blocks:', e);
+  }
+}
+
+/* -------------------------
+   Helpers
+------------------------- */
+const html = s => {
+  if (s == null) return '';
+  const map = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' };
+  return String(s).replace(/[&<>"']/g, m => map[m]);
+};
+const attr = s => html(s).replace(/"/g, '&quot;');
+const mergeSurfaceStyle = (p) => {
+  const base = p.baseSurfaceStyle || '';
+  const over = p.style || '';
+  return base + (base.endsWith(';') || !base ? '' : ';') + over;
+};
+
+const shHelpers = { 
+  html, attr, mergeSurfaceStyle, 
+  field: (...args) => field(...args), 
+  textarea: (...args) => textarea(...args), 
+  arrayEditor: (...args) => arrayEditor(...args), 
+  addCountControls: (...args) => addCountControls(...args), 
+  ensureLength: (...args) => ensureLength(...args), 
+  openGlobalAddonsModal: (...args) => openGlobalAddonsModal(...args) 
+};
+window.shHelpers = shHelpers;
+
+/* -------------------------
+   UI Helpers
+------------------------- */
+function field(label, type, value, on){
+  const d = document.createElement('div'); d.className='field';
+  const isColor = label.toLowerCase().match(/(color|bg|background|tint|accent)/i);
+  
+  if (isColor) {
+    const hex = (value && typeof value === 'string' && value.match(/^#[0-9A-Fa-f]{6}$/)) ? value : '#000000';
+    const colorBox = `<input type="color" value="${hex}" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />`;
+    d.innerHTML = `<label>${label}</label><div style="display:flex; gap:6px;"><input type="${type}" value="${attr(value)}" style="flex:1;"/>${colorBox}</div>`;
+    
+    const textInp = d.querySelector(`input[type="${type}"]`);
+    const colInp = d.querySelector('input[type="color"]');
+    
+    textInp.addEventListener('input', e=> {
+      if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) { colInp.value = e.target.value; }
+      on(e.target.value);
+    });
+    colInp.addEventListener('input', e=> {
+      textInp.value = e.target.value;
+      on(e.target.value);
+    });
+  } else {
+    d.innerHTML = `<label>${label}</label><input type="${type}" value="${attr(value)}"/>`;
+    d.querySelector('input').addEventListener('input', e=> on(e.target.value));
+  }
+  return d;
+}
+
+function textarea(label, value, on){
+  const d = document.createElement('div'); d.className='field';
+  d.innerHTML = `<label>${label}</label><textarea>${html(value)}</textarea>`;
+  d.querySelector('textarea').addEventListener('input', e=> on(e.target.value));
+  return d;
+}
+
+function addCountControls(container, label, count, onChange){
+  const wrap = document.createElement('div'); wrap.className='field';
+  wrap.innerHTML = `<label>${label} (count)</label><input type="number" min="0" value="${count}">`;
+  wrap.querySelector('input').addEventListener('input', e=>{
+    const n = Math.max(0, parseInt(e.target.value||'0',10));
+    onChange(n);
+  });
+  container.appendChild(wrap);
+}
+
+function ensureLength(arr, n, makeItem){
+  const a = (arr || []).slice(0, n);
+  while(a.length < n) a.push(makeItem());
+  return a;
+}
+
+function arrayEditor(label, keys, arr, onChange){
+  const el = document.createElement('div'); el.className='field';
+  const l = document.createElement('label'); l.innerText = label; el.appendChild(l);
+  
+  const list = document.createElement('div'); list.style.marginTop='8px';
+  (arr||[]).forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--panel2); border:1px solid var(--border); padding:8px; border-radius:6px; margin-bottom:8px; position:relative;';
+    
+    const btnDel = document.createElement('button');
+    btnDel.innerText = 'Delete';
+    btnDel.className = 'tool danger';
+    btnDel.style.cssText = 'font-size:10px; padding:2px 6px; cursor:pointer; float:right; margin-bottom:4px;';
+    btnDel.onclick = () => { arr.splice(idx, 1); onChange(arr); updateInspector(); };
+    card.appendChild(btnDel);
+
+    keys.forEach(k => {
+      const row = document.createElement('div'); row.style.marginBottom='6px'; row.style.clear='both';
+      const klabel = document.createElement('div'); klabel.innerText=k; klabel.style.cssText='font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:2px;';
+      const isLarge = k==='desc' || k==='text' || k==='code' || k==='a' || k==='details';
+      const inp = document.createElement(isLarge ? 'textarea' : 'input');
+      inp.value = Array.isArray(item[k]) ? item[k].join(', ') : item[k];
+      inp.style.cssText = `width:100%; box-sizing:border-box; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text); font-family:${k.includes('code')?'monospace':'inherit'};`;
+      if(isLarge) inp.style.height = '60px';
+      
+      inp.oninput = (e) => { 
+        if(Array.isArray(item[k])) item[k] = e.target.value.split(',').map(s=>s.trim());
+        else item[k] = e.target.value; 
+        onChange(arr); 
+      };
+      
+      row.appendChild(klabel); row.appendChild(inp);
+      card.appendChild(row);
+    });
+    list.appendChild(card);
+  });
+  el.appendChild(list);
+
+  const btnAdd = document.createElement('button');
+  btnAdd.innerText = '+ Add ' + label;
+  btnAdd.className = 'tool';
+  btnAdd.style.width = '100%';
+  btnAdd.onclick = () => { 
+    const nu = {}; keys.forEach(k=>{
+      if(k==='stars') nu[k]=5; else if(k==='highlight') nu[k]='false'; else if(k==='feats') nu[k]=['Feature']; else nu[k]='';
+    }); 
+    arr.push(nu); onChange(arr); updateInspector();
+  };
+  el.appendChild(btnAdd);
+  
+  return el;
+}
+
+/* -------------------------
+   Render Loop
+------------------------- */
+function render(){
+  const root = $('#canvas');
+  if(!root) return;
+  root.innerHTML = state.blocks.map(b=>{
+    const def = Blocks[b.type];
+    if(!def) return `<div class="block-error">Block not loaded: ${b.type}</div>`;
+    return def.render(b.props, shHelpers);
+  }).join('');
+  
+  let i=0; 
+  root.querySelectorAll('.block').forEach(el=>{ 
+    const blk = state.blocks[i++];
+    if(blk) {
+      el.dataset.id = blk.id; 
+      if(blk.hidden) el.style.display = 'none';
+    }
+  });
+
+  attachCanvasHandlers();
+  if(state.selectedId) selectBlock(state.selectedId, false);
+  autosave();
+  
+  if(!$('#panel-layers').classList.contains('hidden')) {
+    renderLayers();
+  }
+}
+
+function renderLayers() {
+  const list = $('#layers-list');
+  if(!list) return;
+  list.innerHTML = '';
+  
+  if(state.blocks.length === 0) {
+    list.innerHTML = '<div class="hint">No blocks added yet.</div>';
+    return;
+  }
+  
+  state.blocks.forEach((blk, idx) => {
+    const el = document.createElement('div');
+    el.className = 'layer-item';
+    if(blk.id === state.selectedId) el.classList.add('sel');
+    
+    el.draggable = true;
+    el.dataset.id = blk.id;
+    
+    el.addEventListener('dragstart', e => {
+      state.drag.sourceId = blk.id;
+      state.drag.newType = null;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', blk.id);
+    });
+    
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      state.drag.overId = blk.id;
+      state.drag.where = y < rect.height/2 ? 'before' : 'after';
+      
+      clearLayerDropLines();
+      const line = document.createElement('div');
+      line.className = 'layer-drop-line';
+      if(state.drag.where === 'before') el.before(line); else el.after(line);
+    });
+    
+    el.addEventListener('dragleave', () => clearLayerDropLines());
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      onDropCommit();
+    });
+    
+    el.onclick = (e) => {
+      selectBlock(blk.id);
+    };
+    
+    const info = document.createElement('div');
+    info.className = 'layer-info';
+    info.innerHTML = `
+      <div class="layer-title">${html(blk.name || Blocks[blk.type]?.label || blk.type)} ${blk.hidden ? '👁️‍🗨️' : ''}</div>
+      <div class="layer-type">${blk.type}</div>
+    `;
+    
+    const actions = document.createElement('div');
+    actions.className = 'layer-actions';
+    
+    const btnUp = document.createElement('button');
+    btnUp.className = 'layer-btn';
+    btnUp.innerHTML = '↑';
+    btnUp.onclick = (e) => {
+      e.stopPropagation();
+      if(idx > 0) {
+        [state.blocks[idx-1], state.blocks[idx]] = [state.blocks[idx], state.blocks[idx-1]];
+        render(); selectBlock(blk.id); 
+      }
+    };
+    
+    const btnDown = document.createElement('button');
+    btnDown.className = 'layer-btn';
+    btnDown.innerHTML = '↓';
+    btnDown.onclick = (e) => {
+      e.stopPropagation();
+      if(idx < state.blocks.length - 1) {
+        [state.blocks[idx+1], state.blocks[idx]] = [state.blocks[idx], state.blocks[idx+1]];
+        render(); selectBlock(blk.id); 
+      }
+    };
+    
+    actions.appendChild(btnUp);
+    actions.appendChild(btnDown);
+    el.appendChild(info);
+    el.appendChild(actions);
+    list.appendChild(el);
+  });
+}
+
+function clearLayerDropLines() {
+  $$('.layer-drop-line').forEach(el => el.remove());
+}
+
+/* -------------------------
+   Selection + Inspector
+------------------------- */
+function getSelected(){ return state.blocks.find(b=>b.id===state.selectedId); }
+
+function selectBlock(id, doUpdateInspector=true){
+  state.selectedId = id;
+  $$('#canvas .block').forEach(el=> el.classList.toggle('sel', el.dataset.id===id));
+  $$('.layer-item').forEach(el=> el.classList.toggle('sel', el.dataset.id===id));
+  if(doUpdateInspector) updateInspector();
+}
+
+function updateInspector(){
+  const sel = getSelected();
+  const f = $('#content-fields');
+  f.innerHTML = '';
+  $('#sel-path').textContent = sel ? `Selected: ${sel.type} (${sel.id})` : 'No selection';
+  
+  if(!sel) return;
+
+  // Sync general style fields
+  $('#st-margin').value = readCSS(sel.props.style, 'margin');
+  $('#st-padding').value = readCSS(sel.props.style, 'padding');
+  const bg = readCSS(sel.props.style, 'background');
+  $('#st-bg').value = bg;
+  if (bg.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-bg-picker').value = bg;
+  
+  $('#st-border').value = readCSS(sel.props.style, 'border');
+  $('#st-radius').value = readCSS(sel.props.style, 'border-radius');
+  
+  const col = readCSS(sel.props.style, 'color');
+  $('#st-color').value = col;
+  if (col.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-color-picker').value = col;
+  
+  $('#st-inline').value = inlineRemainder(sel.props.style, ['margin','padding','background','border','border-radius','color']);
+  $('#blk-name').value = sel.name || '';
+  $('#blk-visible').value = sel.hidden ? 'hidden' : '';
+
+  const def = Blocks[sel.type];
+  if(def && def.inspector) {
+    def.inspector(f, sel.props, render, shHelpers);
+  }
+}
+
+/* -------------------------
+   Library
+------------------------- */
+function buildLibrary(){
+  const list = $('#lib-list');
+  if(!list) return;
+  list.innerHTML = '';
+  Object.entries(Blocks).forEach(([type,def])=>{
+    const card = document.createElement('div');
+    card.className = 'block-card';
+    card.draggable = true;
+    card.dataset.type = type;
+    card.innerHTML = `<h4>${def.label}</h4><p>${def.desc}</p>`;
+    card.addEventListener('dragstart', e=>{
+      state.drag.newType = type;
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('text/plain', 'new-block');
+    });
+    list.appendChild(card);
+  });
+  
+  const searchInput = $('#lib-search');
+  if(searchInput){
+    searchInput.oninput = (e)=>{
+      const q = e.target.value.toLowerCase();
+      $$('#lib-list .block-card').forEach(el=>{
+        const type = el.dataset.type;
+        const s = `${Blocks[type].label} ${Blocks[type].desc}`.toLowerCase();
+        el.style.display = s.includes(q) ? '' : 'none';
+      });
+    };
+  }
+}
+
+/* -------------------------
+   Drag & Drop Handlers
+------------------------- */
+function attachCanvasHandlers(){
+  const root = $('#canvas');
+  clearDropLines();
+
+  root.querySelectorAll('.block').forEach(el=>{
+    const id = el.dataset.id;
+    
+    if(!el.querySelector('.drag-handle')){
+      const h = document.createElement('div');
+      h.className = 'drag-handle';
+      h.innerHTML = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 4h4v2h-4V4m0 14h4v2h-4v-2M4 10h2v4H4v-4m14 0h2v4h-2v-4M6.5 6.5l1.4-1.4L9.8 7L8.4 8.4L6.5 6.5m0 11l1.9-1.9L9.8 17l-1.9 1.9l-1.4-1.4m11-11L17.5 8.4L15.6 6.5l1.4-1.4l1.5 1.4m0 11l-1.5 1.4l-1.4-1.4l1.9-1.9l1 1.9Z"/></svg>';
+      el.appendChild(h);
+
+      h.addEventListener('dragstart', e=>{
+        state.drag.sourceId = id;
+        state.drag.newType = null;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', id);
+      });
+      h.setAttribute('draggable','true');
+    }
+
+    el.onclick = e => { selectBlock(id); e.stopPropagation(); };
+
+    el.addEventListener('dragover', e=>{
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const where = y < rect.height/2 ? 'before' : 'after';
+      showDropLine(el, where);
+      state.drag.overId = id;
+      state.drag.where = where;
+    });
+
+    el.addEventListener('dragleave', ()=> clearDropLines());
+    el.addEventListener('drop', e=>{ e.preventDefault(); onDropCommit(); });
+  });
+
+  root.onclick = () => selectBlock(null);
+  root.addEventListener('dragover', e=> e.preventDefault());
+  root.addEventListener('drop', e=>{
+    e.preventDefault();
+    if(!state.drag.overId) onDropCommit(true);
+  });
+}
+
+function onDropCommit(dropToEnd=false){
+  clearDropLines();
+  const { sourceId, newType, overId, where } = state.drag;
+
+  if(newType){
+    const blk = { id:uid(), type:newType, props:Blocks[newType].defaults() };
+    if(dropToEnd || !overId){
+      state.blocks.push(blk);
+    }else{
+      const idx = state.blocks.findIndex(b=>b.id===overId);
+      state.blocks.splice(where==='before'? idx : idx+1, 0, blk);
+    }
+    render(); selectBlock(blk.id);
+  } else if(sourceId){
+    const from = state.blocks.findIndex(b=>b.id===sourceId);
+    if(from<0) return;
+    const [blk] = state.blocks.splice(from,1);
+    const to = dropToEnd ? state.blocks.length : state.blocks.findIndex(b=>b.id===overId);
+    if(to < 0) state.blocks.push(blk);
+    else state.blocks.splice(where==='before' ? to : to+1, 0, blk);
+    render(); selectBlock(blk.id);
+  }
+  state.drag = { sourceId:null, newType:null, overId:null, where:'before' };
+}
+
+function showDropLine(target, where){
+  clearDropLines();
+  const line = document.createElement('div');
+  line.className = 'drop-line';
+  if(where==='before') target.before(line); else target.after(line);
+}
+function clearDropLines(){ $$('.drop-line').forEach(el=>el.remove()); }
+
+/* -------------------------
+   Toolbar Handlers
+------------------------- */
+$('#btn-dup').onclick = ()=>{
+  const sel=getSelected(); if(!sel) return;
+  const i=state.blocks.findIndex(b=>b.id===sel.id);
+  const nu = JSON.parse(JSON.stringify(sel));
+  nu.id = uid();
+  state.blocks.splice(i+1, 0, nu);
+  render();
+};
+$('#btn-up').onclick = ()=>{
+  const sel=getSelected(); if(!sel) return;
+  const i=state.blocks.findIndex(b=>b.id===sel.id);
+  if(i>0){ [state.blocks[i-1],state.blocks[i]]=[state.blocks[i],state.blocks[i-1]]; render(); selectBlock(sel.id);}
+};
+$('#btn-down').onclick = ()=>{
+  const sel=getSelected(); if(!sel) return;
+  const i=state.blocks.findIndex(b=>b.id===sel.id);
+  if(i<state.blocks.length-1){ [state.blocks[i+1],state.blocks[i]]=[state.blocks[i],state.blocks[i+1]]; render(); selectBlock(sel.id);}
+};
+$('#btn-del').onclick = ()=>{
+  const sel=getSelected(); if(!sel) return;
+  if(confirm('Delete selection?')){
+    state.blocks = state.blocks.filter(b=>b.id!==sel.id);
+    state.selectedId=null; render();
+  }
+};
+
+/* -------------------------
+   Style Inputs
+------------------------- */
+$('#st-margin').oninput = rebuildStyle;
+$('#st-padding').oninput = rebuildStyle;
+$('#st-bg').oninput = e => {
+  if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-bg-picker').value = e.target.value;
+  rebuildStyle();
+};
+$('#st-bg-picker').oninput = e => {
+  $('#st-bg').value = e.target.value;
+  rebuildStyle();
+};
+$('#st-border').oninput = rebuildStyle;
+$('#st-radius').oninput = rebuildStyle;
+$('#st-color').oninput = e => {
+  if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-color-picker').value = e.target.value;
+  rebuildStyle();
+};
+$('#st-color-picker').oninput = e => {
+  $('#st-color').value = e.target.value;
+  rebuildStyle();
+};
+$('#st-inline').oninput = rebuildStyle;
+
+$('#blk-name').oninput = e=>{ 
+  const sel=getSelected(); 
+  if(sel){ 
+    sel.name=e.target.value; 
+    renderLayers(); 
+  }
+};
+$('#blk-visible').onchange = e=>{
+  const sel=getSelected(); if(sel){
+    sel.hidden = e.target.value === 'hidden';
+    render();
+  }
+};
+
+function readCSS(inline, key){
+  if(!inline) return '';
+  const m = (inline.match(new RegExp(key+":\\s*[^;]+"))||[])[0];
+  return m ? m.split(':').slice(1).join(':').trim() : '';
+}
+function inlineRemainder(inline, keys){
+  if(!inline) return '';
+  const parts = inline.split(';').map(s=>s.trim()).filter(Boolean).filter(kv=>!keys.some(k=>kv.startsWith(k+':')));
+  return parts.join('; ');
+}
+function kv(k,v){ return v ? `${k}:${v};` : ''; }
+
+function rebuildStyle(){
+  const sel = getSelected(); if(!sel) return;
+  const v = {
+    margin:  $('#st-margin').value,
+    padding: $('#st-padding').value,
+    background: $('#st-bg').value,
+    border:  $('#st-border').value,
+    radius:  $('#st-radius').value,
+    color:   $('#st-color').value,
+    rest:    $('#st-inline').value
+  };
+  sel.props.style =
+    `${kv('margin',v.margin)}${kv('padding',v.padding)}${kv('background',v.background)}${kv('border',v.border)}${kv('border-radius',v.radius)}${kv('color',v.color)}${v.rest ? (v.rest.endsWith(';')? v.rest : v.rest+';') : ''}`;
+  render();
+}
+
+/* -------------------------
+   Top Bar Actions
+------------------------- */
+$('#btn-new').onclick = ()=>{ if(confirm('Start a new page?')){ loadDefault(); }};
+$('#btn-save').onclick = ()=>{ openModal('modal-save'); $('#save-name').value = `Template ${new Date().toLocaleString()}`; };
+$('#save-do').onclick = ()=>{
+  const name=$('#save-name').value.trim(); if(!name) return;
+  const list = JSON.parse(localStorage.getItem('sh_templates')||'[]');
+  list.unshift({ name, data: JSON.stringify(state.blocks) });
+  localStorage.setItem('sh_templates', JSON.stringify(list.slice(0,50)));
+  closeModal('modal-save'); alert('Saved.');
+};
+$('#save-file-do').onclick = ()=>{
+  const name=$('#save-name').value.trim() || 'template';
+  downloadJSON(state.blocks, `superhive_layout_${name.toLowerCase().replace(/\s+/g, '_')}.json`);
+  closeModal('modal-save');
+};
+
+$('#btn-load').onclick = ()=>{ openModal('modal-load'); buildLoadList(); };
+$('#load-do').onclick = ()=>{
+  const sel=$('#load-select').value; if(!sel) return;
+  state.blocks = JSON.parse(sel); state.selectedId=null; render(); closeModal('modal-load');
+};
+$('#load-file-do').onclick = ()=>{
+  uploadJSON(json => {
+    if(!Array.isArray(json)) return alert('Invalid template file.');
+    state.blocks = json; state.selectedId = null; render(); closeModal('modal-load');
+  });
+};
+
+$('#btn-import').onclick = ()=> openModal('modal-import');
+$('#import-do').onclick = ()=>{
+  const val=$('#import-html').value;
+  const safe = val.replace(/<script[\s\S]*?<\/script>/gi,'');
+  state.blocks = [{ id:uid(), type:'raw', props: Blocks.raw.defaults() }];
+  state.blocks[0].props.html = safe;
+  render(); closeModal('modal-import');
+};
+
+$('#btn-export').onclick = ()=> exportHTML();
+$('#btn-bg-variants').onclick = ()=> openBGVariants();
+$('#btn-copy').onclick = ()=> copyExportHTML();
+
+function buildLoadList(){
+  const list = JSON.parse(localStorage.getItem('sh_templates')||'[]');
+  const sel = $('#load-select'); sel.innerHTML='';
+  list.forEach(t=>{
+    const o=document.createElement('option'); o.textContent=t.name; o.value=t.data; sel.appendChild(o);
+  });
+}
+
+/* -------------------------
+   Export Logic
+------------------------- */
+function buildExportHTML(){
+  const raw = state.blocks.map(b => Blocks[b.type].render(b.props, shHelpers)).join('\n');
+  const container = document.createElement('div');
+  container.innerHTML = raw;
+  container.querySelectorAll('.block').forEach(bl => {
+    const parent = bl.parentNode;
+    while (bl.firstChild) parent.insertBefore(bl.firstChild, bl);
+    parent.removeChild(bl);
+  });
+  
+  // Basic inline style injection for core classes
+  const classes = {
+    '.sh-card': 'background:#ffffff; border:1px solid #e2e6f4; border-radius:16px; padding:16px;',
+    '.sh-card-soft': 'background:#f6f7fb; border:1px solid #e2e6f4; border-radius:14px; padding:14px;',
+    '.sh-hero': 'background:linear-gradient(135deg,#0f1220,#1b2451); color:#eaf0ff; border:1px solid rgba(255,255,255,.15); border-radius:16px; padding:28px 26px;',
+    '.tag': 'display:inline-block; padding:4px 8px; border-radius:999px; background:#f6f7fb; border:1px solid #e2e6f4; color:#394067; font-size:11px;'
+  };
+  
+  Object.entries(classes).forEach(([sel, css])=>{
+    container.querySelectorAll(sel).forEach(el=>{
+      const cur = el.getAttribute('style') || '';
+      el.setAttribute('style', css + (css.endsWith(';')?'':';') + cur);
+    });
+  });
+
+  const shell = document.createElement('div');
+  shell.setAttribute('style', 'max-width:880px; margin:0 auto; font-family:sans-serif; color:#0f1220; line-height:1.55;');
+  shell.innerHTML = container.innerHTML;
+  return shell.outerHTML;
+}
+
+function exportHTML(){
+  const htmlBlob = buildExportHTML();
+  downloadJSON(htmlBlob, 'superhive_export.html', 'text/html');
+}
+
+async function copyExportHTML(){
+  const h = buildExportHTML();
+  try {
+    await navigator.clipboard.writeText(h);
+    alert('Copied to clipboard ✔');
+  } catch(e) {
+    prompt('Copy this:', h);
+  }
+}
+
+/* -------------------------
+   JSON Utils
+------------------------- */
+function downloadJSON(data, filename, type='application/json') {
+  const blob = new Blob([typeof data === 'string' ? data : JSON.stringify(data, null, 2)], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function uploadJSON(callback) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try { callback(JSON.parse(ev.target.result)); } 
+      catch (err) { alert('Invalid JSON'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+/* -------------------------
+   Global Addons Modal
+------------------------- */
+let tempGlobalAddons = [];
+function openGlobalAddonsModal() {
+  tempGlobalAddons = JSON.parse(JSON.stringify(window.globalAddonsRegistry || []));
+  renderGlobalAddonsModalFields();
+  openModal('modal-global-addons');
+}
+
+function renderGlobalAddonsModalFields() {
+  const f = $('#global-addons-fields');
+  if(!f) return;
+  f.innerHTML = '';
+  addCountControls(f, 'Addons', tempGlobalAddons.length, (n)=>{
+    tempGlobalAddons = ensureLength(tempGlobalAddons, n, ()=>({ href:'#', img:'https://picsum.photos/800/450', title:'New', sub:'Desc', tags:[] }));
+    renderGlobalAddonsModalFields();
+  });
+  tempGlobalAddons.forEach((c,i)=>{
+    f.appendChild(field(`Item ${i+1} Title`,'text',c.title,(v)=>c.title=v));
+    f.appendChild(field(`Item ${i+1} Link`,'text',c.href,(v)=>c.href=v));
+    f.appendChild(field(`Item ${i+1} Img`,'text',c.img,(v)=>c.img=v));
+    f.appendChild(textarea(`Item ${i+1} Tags`,(c.tags||[]).join(', '),(v)=>c.tags=v.split(',').map(s=>s.trim()).filter(Boolean)));
+    const hr = document.createElement('hr'); hr.style.margin="12px 0"; f.appendChild(hr);
+  });
+}
+
+$('#save-global-addons-do').onclick = ()=>{
+  window.globalAddonsRegistry = tempGlobalAddons;
+  localStorage.setItem('sh_global_addons', JSON.stringify(window.globalAddonsRegistry));
+  render(); closeModal('modal-global-addons');
+};
+$('#export-global-addons-btn').onclick = ()=> downloadJSON(tempGlobalAddons, 'sh_global_addons.json');
+$('#import-global-addons-btn').onclick = ()=> uploadJSON(j => { tempGlobalAddons=j; renderGlobalAddonsModalFields(); });
+
+/* -------------------------
+   Background Variants
+------------------------- */
+const BG_VARIANTS = [
+  { name:'Deep Navy', css:'#0f1220' },
+  { name:'Midnight',  css:'#0b0f19' },
+  { name:'Obsidian Slate', css:'linear-gradient(135deg, #232526 0%, #414345 100%)' },
+  { name:'Synthwave', css:'linear-gradient(135deg, #130cb7 0%, #5218fa 100%)' },
+  { name:'Deep Space', css:'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' },
+  { name:'Blender UI', css:'linear-gradient(135deg, #353535 0%, #212121 100%)' },
+  { name:'Blender Orange', css:'linear-gradient(135deg, #e87b28 0%, #c45700 100%)' },
+  { name:'Cyber Pink', css:'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)' },
+  { name:'Obsidian Prism', css:'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)), #050608' },
+];
+
+function openBGVariants(){
+  const grid = $('#bg-variants-grid');
+  grid.innerHTML = '';
+  BG_VARIANTS.forEach(v=>{
+    const it = document.createElement('div');
+    it.className = 'bg-item';
+    it.innerHTML = `<div class="swatch" style="background:${v.css}"></div><div class="meta"><div>${v.name}</div><code>${v.css}</code></div>`;
+    const btn = document.createElement('button');
+    btn.textContent = 'Use';
+    btn.onclick = ()=>{ $('#st-bg').value=v.css; rebuildStyle(); closeModal('modal-bg'); };
+    it.querySelector('.meta').appendChild(btn);
+    grid.appendChild(it);
+  });
+  openModal('modal-bg');
+}
+
+/* -------------------------
+   Boot
+------------------------- */
+function loadDefault(){
+  const order = ['hero','statTrio','overview','features6','media','youtube','updates','bullets','wow','imgRow3','ctaBanner','moreAddons'];
+  state.blocks = order.map(type => ({ id:uid(), type, props: Blocks[type].defaults() }));
+  state.selectedId=null; render();
+}
+
+function autosave(){ localStorage.setItem('sh_autosave', JSON.stringify(state.blocks)); }
+function tryRestore(){ 
+  const a=localStorage.getItem('sh_autosave'); 
+  if(a){ try { state.blocks = JSON.parse(a); render(); return true; } catch(e){} } 
+  return false; 
+}
+
+function openModal(id){ $('#'+id).style.display='flex'; }
+function closeModal(id){ $('#'+id).style.display='none'; }
+
+// Shortcut listeners
+window.addEventListener('keydown', (e)=>{
+  if(e.key==='Delete' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { $('#btn-del').click(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s') { e.preventDefault(); $('#btn-save').click(); }
+});
+
+// Tab switching
+$('#tab-lib').onclick = () => {
+  $('#tab-lib').classList.add('active'); $('#tab-layers').classList.remove('active');
+  $('#panel-lib').classList.remove('hidden'); $('#panel-layers').classList.add('hidden');
+};
+$('#tab-layers').onclick = () => {
+  $('#tab-layers').classList.add('active'); $('#tab-lib').classList.remove('active');
+  $('#panel-layers').classList.remove('hidden'); $('#panel-lib').classList.add('hidden');
+  renderLayers();
+};
+
+// Start
+initBlocks();

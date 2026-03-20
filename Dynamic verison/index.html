@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SuperHive Add-on Page Builder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- App bar -->
+  <header class="appbar">
+    <div class="title">🧩 SuperHive Add-on Page Builder</div>
+    <div class="spacer"></div>
+    <button class="btn" id="btn-new">New</button>
+    <button class="btn" id="btn-save">Save Template</button>
+    <button class="btn" id="btn-load">Load Template</button>
+    <button class="btn" id="btn-import">Import HTML</button>
+    <button class="btn" id="btn-export">Export HTML</button>
+    <button class="btn" id="btn-copy">Copy HTML</button> 
+    <button class="btn" id="btn-bg-variants">BG Variants</button>
+    <button class="btn" id="btn-global-addons" style="border-color:var(--accent); color:var(--text);">Global Addons Template</button>
+  </header>
+
+  <div class="app">
+    <!-- LEFT: Block Library & Layers -->
+    <aside class="left col">
+      <div class="tabs">
+        <button class="tab active" id="tab-lib">Library</button>
+        <button class="tab" id="tab-layers">Layers</button>
+      </div>
+      <div class="library" id="panel-lib">
+        <input id="lib-search" class="lib-search" placeholder="Search blocks…"/>
+        <div id="lib-list"></div>
+      </div>
+      <div class="layers hidden" id="panel-layers">
+        <div id="layers-list"></div>
+      </div>
+    </aside>
+
+    <!-- CENTER: Canvas -->
+    <main class="center col">
+      <div class="canvas-wrap">
+        <!-- The builder mounts blocks inside here -->
+        <div id="canvas" class="canvas" tabindex="0"></div>
+      </div>
+    </main>
+
+    <!-- RIGHT: Inspector -->
+    <aside class="right col">
+      <div class="panel">
+        <div class="toolbar">
+          <button class="tool" id="btn-dup">Duplicate</button>
+          <button class="tool" id="btn-up">Move ↑</button>
+          <button class="tool" id="btn-down">Move ↓</button>
+          <button class="tool danger" id="btn-del">Delete</button>
+        </div>
+        <div class="hint" id="sel-path">No selection</div>
+
+        <h3>Content</h3>
+        <div id="content-fields"></div>
+
+        <h3>Style</h3>
+        <div class="row">
+          <div class="field">
+            <label>Margin</label>
+            <input id="st-margin" placeholder="e.g. 0 0 18px 0"/>
+          </div>
+          <div class="field">
+            <label>Padding</label>
+            <input id="st-padding" placeholder="e.g. 16px"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Background</label>
+            <div style="display:flex; gap:6px;">
+              <input id="st-bg" placeholder="#ffffff or gradient" style="flex:1;"/>
+              <input type="color" id="st-bg-picker" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Border</label>
+            <input id="st-border" placeholder="1px solid #e2e6f4"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Radius</label>
+            <input id="st-radius" placeholder="16px"/>
+          </div>
+          <div class="field">
+            <label>Color</label>
+            <div style="display:flex; gap:6px;">
+              <input id="st-color" placeholder="#0f1220" style="flex:1;"/>
+              <input type="color" id="st-color-picker" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Custom Inline CSS</label>
+          <textarea id="st-inline" placeholder="e.g. display:flex;flex-wrap:wrap;"></textarea>
+        </div>
+
+        <h3>Block</h3>
+        <div class="row">
+          <div class="field">
+            <label>Block Name</label>
+            <input id="blk-name"/>
+          </div>
+          <div class="field">
+            <label>Visibility</label>
+            <select id="blk-visible">
+              <option value="">Visible</option>
+              <option value="hidden">Hidden</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal" id="modal-load">
+    <div class="box">
+      <h2>Load Template</h2>
+      <div class="field">
+        <label>Saved templates</label>
+        <select id="load-select"></select>
+      </div>
+      <div class="toolbar">
+        <button class="tool" id="load-do">Load from Storage</button>
+        <button class="tool" id="load-file-do">Load from JSON File...</button>
+        <button class="tool" onclick="closeModal('modal-load')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-save">
+    <div class="box">
+      <h2>Save Template</h2>
+      <div class="field"><label>Name</label><input id="save-name"/></div>
+      <div class="toolbar">
+        <button class="tool" id="save-do">Save to Storage</button>
+        <button class="tool" id="save-file-do">Download to JSON File...</button>
+        <button class="tool" onclick="closeModal('modal-save')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-import">
+    <div class="box">
+      <h2>Import Raw HTML</h2>
+      <textarea id="import-html" placeholder="Paste your SuperHive page HTML here…"></textarea>
+      <div class="toolbar">
+        <button class="tool" id="import-do">Import</button>
+        <button class="tool" onclick="closeModal('modal-import')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Add-ons Template Modal -->
+  <div class="modal" id="modal-global-addons">
+    <div class="box">
+      <h2>Edit Global Add-ons Template</h2>
+      <p class="hint" style="margin-bottom:12px;color:var(--accent);">These addons will automatically synchronize to all your saved layouts that use the "More Add-ons Grid" block.</p>
+      <div id="global-addons-fields"></div>
+      <div class="toolbar" style="margin-top:16px;">
+        <button class="tool" id="save-global-addons-do" style="border-color:var(--accent); color:var(--text);">Save Global Addons & Sync</button>
+        <button class="tool" id="export-global-addons-btn">Download JSON File...</button>
+        <button class="tool" id="import-global-addons-btn">Import JSON File...</button>
+        <button class="tool" onclick="closeModal('modal-global-addons')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Variants Modal -->
+  <div class="modal" id="modal-bg">
+    <div class="box">
+      <h2>Background Variants</h2>
+      <div id="bg-variants-grid" class="bg-grid"></div>
+      <div class="toolbar">
+        <button class="tool" onclick="closeModal('modal-bg')">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- App logic -->
+  <script src="app.js" type="module" defer></script>
+</body>
+</html>
