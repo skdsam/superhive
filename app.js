@@ -619,6 +619,8 @@ const Blocks = {
     desc: 'Glossy glassmorphism grid',
     defaults: ()=>({
       title: 'Premium Features',
+      titleColor: '#ffffff',
+      descColor: '#cbd5e1',
       glassTint: 'rgba(255,255,255,0.05)',
       glowColor: 'rgba(37,99,235,0.3)',
       cols: '3',
@@ -634,16 +636,23 @@ const Blocks = {
       const grid = p.cards.map(c => `
         <div style="background:${p.glassTint}; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:32px; text-align:center; position:relative; z-index:2; box-shadow:0 4px 30px rgba(0,0,0,0.1);">
           <div style="font-size:40px; margin-bottom:16px; filter:drop-shadow(0 0 12px ${p.glowColor});">${html(c.icon)}</div>
-          <h3 style="margin:0 0 12px 0; font-size:20px; font-weight:700; color:#fff;">${html(c.title)}</h3>
-          <p style="margin:0; font-size:15px; color:#cbd5e1; line-height:1.6;">${html(c.desc)}</p>
+          <h3 style="margin:0 0 12px 0; font-size:20px; font-weight:700; color:${p.titleColor || '#fff'};">${html(c.title)}</h3>
+          <p style="margin:0; font-size:15px; color:${p.descColor || '#cbd5e1'}; line-height:1.6;">${html(c.desc)}</p>
         </div>
       `).join('');
+      
+      // Determine min-width based on column count to help grid behavior
+      let minW = '250px';
+      if (p.cols === '1') minW = '100%';
+      else if (p.cols === '2') minW = '350px';
+      else if (p.cols === '4') minW = '200px';
+
       return `
       <div class="block" data-type="glossyCards">
         <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
           <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:60%; height:60%; background:${p.glowColor}; filter:blur(100px); border-radius:50%; z-index:0; opacity:0.6; pointer-events:none;"></div>
           <h2 style="text-align:center; font-size:32px; font-weight:800; color:#fff; margin:0 0 40px 0; position:relative; z-index:2;">${html(p.title)}</h2>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(${p.cols==='2'?'400px':'250px'}, 1fr)); gap:24px; position:relative; z-index:2;">
+          <div style="display:grid; grid-template-columns:repeat(${p.cols || 3}, 1fr); gap:24px; position:relative; z-index:2;">
             ${grid}
           </div>
         </div>
@@ -1755,9 +1764,14 @@ function updateInspector(){
 
   if(sel.type==='glossyCards'){
     f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(field('Title Color','text',sel.props.titleColor || '#ffffff',(v)=>{ sel.props.titleColor=v; render(); }));
+    f.appendChild(field('Description Color','text',sel.props.descColor || '#cbd5e1',(v)=>{ sel.props.descColor=v; render(); }));
     f.appendChild(field('Glass Tint','text',sel.props.glassTint,(v)=>{ sel.props.glassTint=v; render(); }));
     f.appendChild(field('Glow Color','text',sel.props.glowColor,(v)=>{ sel.props.glowColor=v; render(); }));
-    f.appendChild(field('Grid Columns','text',sel.props.cols,(v)=>{ sel.props.cols=v; render(); }));
+    const colF = field('Grid Columns','number',sel.props.cols,(v)=>{ sel.props.cols=v; render(); });
+    colF.querySelector('input').min = 1;
+    colF.querySelector('input').max = 6;
+    f.appendChild(colF);
     f.appendChild(arrayEditor('Cards', ['icon','title','desc'], sel.props.cards, (a)=>{ sel.props.cards=a; render(); }));
   }
 
