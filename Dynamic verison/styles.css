@@ -3,6 +3,7 @@
   --bg: #f3f4f6;        /* canvas bg */
   --panel: #ffffff;     /* side panels */
   --panel2: #f9fafb;    /* inputs/search bg */
+  --bg-soft: #f1f5f9;   /* hover background for menu items */
   --text: #111827;      /* dark text */
   --muted: #6b7280;     /* light text */
   --accent: #2563eb;    /* blue primary */
@@ -63,6 +64,15 @@ header.appbar #btn-global-addons:hover { background: #eff6ff; }
   background: #ffffff; border: 1px solid var(--border); border-radius: 8px;
   padding: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   margin-top: 4px; z-index: 200;
+}
+/* Bridge the 4px gap between button and menu to prevent hover loss */
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px; 
+    left: 0;
+    right: 0;
+    height: 8px;
 }
 .dropdown:hover .dropdown-menu { display: block; }
 .dropdown-menu a, .dropdown-menu button {
