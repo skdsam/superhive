@@ -92,9 +92,15 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
       const row = document.createElement('div'); row.style.marginBottom='6px'; row.style.clear='both';
       const klabel = document.createElement('div'); klabel.innerText=k; klabel.style.cssText='font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:2px;';
       const isLarge = k==='desc' || k==='text' || k==='code' || k==='a' || k==='details';
+      const isColor = k.toLowerCase().match(/(color|bg|background|tint|accent)/i);
+      
+      const inpWrap = document.createElement('div');
+      inpWrap.style.display = 'flex';
+      inpWrap.style.gap = '6px';
+      
       const inp = document.createElement(isLarge ? 'textarea' : 'input');
       inp.value = Array.isArray(item[k]) ? item[k].join(', ') : item[k];
-      inp.style.cssText = `width:100%; box-sizing:border-box; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text); font-family:${k.includes('code')?'monospace':'inherit'};`;
+      inp.style.cssText = `flex:1; box-sizing:border-box; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text); font-family:${k.includes('code')?'monospace':'inherit'};`;
       if(isLarge) inp.style.height = '60px';
       
       inp.oninput = (e) => { 
@@ -102,8 +108,30 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
         else item[k] = e.target.value; 
         onChange(arr); 
       };
+
+      inpWrap.appendChild(inp);
+
+      if (isColor && !isLarge) {
+        const hex = (item[k] && typeof item[k] === 'string' && item[k].match(/^#[0-9A-Fa-f]{6}$/)) ? item[k] : '#000000';
+        const colInp = document.createElement('input');
+        colInp.type = 'color';
+        colInp.value = hex;
+        colInp.style.cssText = 'width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;';
+        colInp.oninput = (e) => {
+          inp.value = e.target.value;
+          item[k] = e.target.value;
+          onChange(arr);
+        };
+        // Update color box when text input changes
+        const oldOnInput = inp.oninput;
+        inp.oninput = (e) => {
+          oldOnInput(e);
+          if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) colInp.value = e.target.value;
+        };
+        inpWrap.appendChild(colInp);
+      }
       
-      row.appendChild(klabel); row.appendChild(inp);
+      row.appendChild(klabel); row.appendChild(inpWrap);
       card.appendChild(row);
     });
     list.appendChild(card);
@@ -116,7 +144,12 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
   btnAdd.style.width = '100%';
   btnAdd.onclick = () => { 
     const nu = {}; keys.forEach(k=>{
-      if(k==='stars') nu[k]=5; else if(k==='highlight') nu[k]='false'; else if(k==='feats') nu[k]=['Feature']; else nu[k]='';
+      if(k==='stars') nu[k]=5; 
+      else if(k==='highlight') nu[k]='false'; 
+      else if(k==='feats') nu[k]=['Feature']; 
+      else if(k==='bgColor') nu[k]='#2a3566';
+      else if(k==='textColor') nu[k]='#eaf0ff';
+      else nu[k]='';
     }); 
     arr.push(nu); 
     onChange(arr); 
