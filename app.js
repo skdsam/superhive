@@ -531,11 +531,23 @@ const Blocks = {
     desc: 'Syntax highlighted box',
     defaults: ()=>({
       title: 'addon_script.py',
-      code: 'import bpy\n\n# Initialize the auto-generator\nbpy.ops.node.add_geometry_generator()\nprint("Node tree successfully created!")',
+      lines: [
+        { text: 'import bpy' },
+        { text: '' },
+        { text: '# Initialize the auto-generator' },
+        { text: 'bpy.ops.node.add_geometry_generator()' },
+        { text: 'print("Node tree successfully created!")' }
+      ],
       baseSurfaceStyle: 'margin:0 0 18px 0; padding:24px; background:#0f111a; border:1px solid #1e2433; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.25);',
       style:''
     }),
-    render: (p)=> `
+    render: (p)=> {
+      // Use <br> tags instead of raw \n to ensure HTML parsers never swallow the line break
+      const codeHTML = (p.lines||[]).map(l => {
+         const t = html(l.text) || '&nbsp;'; // preserve empty lines visually
+         return `<div>${t}</div>`;
+      }).join('');
+      return `
       <div class="block" data-type="code">
         <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3143; padding-bottom:12px; margin-bottom:16px;">
@@ -546,9 +558,10 @@ const Blocks = {
             </div>
             <div style="color:#94a3b8; font-family:monospace; font-size:12px;">${html(p.title)}</div>
           </div>
-          <pre style="margin:0; padding:0; overflow-x:auto;"><code style="font-family:Consolas, Monaco, monospace; font-size:14px; color:#e2e8f0; line-height:1.5; white-space:pre;">${html(p.code)}</code></pre>
+          <div style="margin:0; padding:0; overflow-x:auto; font-family:Consolas, Monaco, monospace; font-size:14px; color:#e2e8f0; line-height:1.5; border-radius: 6px; white-space: pre;">${codeHTML}</div>
         </div>
-      </div>`
+      </div>`;
+    }
   },
 
   faq: {
@@ -805,6 +818,148 @@ const Blocks = {
               <!-- Faux output wires -->
               <svg style="position:absolute; left:100%; top:24px; width:60px; height:120px; overflow:visible; pointer-events:none; opacity:0.6;"><path d="M0,0 C20,0 40,30 60,30" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
 
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  blenderModifier: {
+    label: '🔧 Blender Modifier', desc: 'Mimics the Properties Panel',
+    defaults: ()=>({
+      title: 'Modifiers',
+      items: [
+        { name:'Subdivision', icon:'⬡', active:'true', expanded:'false', details:['Levels: 2', 'Render: 3'] },
+        { name:'Superhive Generator', icon:'✨', active:'true', expanded:'true', details:['Seed: 42', 'Density: High'] },
+        { name:'Displace', icon:'🌊', active:'false', expanded:'false', details:['Strength: 0.5'] }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:60px 24px; background:#e5e7eb; border-radius:16px; display:flex; justify-content:center;',
+      style: ''
+    }),
+    render: (p)=> {
+      const mods = p.items.map(m => `
+        <div style="background:#424242; border:1px solid #222; border-radius:4px; margin-bottom:6px; overflow:hidden; font-family:sans-serif; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+          <div style="display:flex; justify-content:space-between; padding:6px 8px; font-size:12px; font-weight:600; background:linear-gradient(to bottom, #505050, #424242);">
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span style="opacity:0.7; font-size:10px;">${m.expanded==='true'?'▼':'▶'}</span>
+              <span>${html(m.icon)}</span>
+              <span style="color:#fff;">${html(m.name)}</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; opacity:0.8;">
+              <span style="color:${m.active==='true'?'#3b82f6':'#aaa'};">💻</span><span>📷</span><span>✖</span>
+            </div>
+          </div>
+          ${m.expanded==='true' ? `
+          <div style="padding:12px; background:#333; font-size:12px; color:#aaa; border-top:1px solid #222;">
+            ${(m.details||[]).map(d=> {
+              const [k,v] = d.split(':');
+              return `<div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+                <span>${html(k)}</span>
+                <span style="background:#222; padding:4px 24px; border-radius:4px; border:1px solid #111; color:#fff;">${html(v||'')}</span>
+              </div>`;
+            }).join('')}
+          </div>` : ''}
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="blenderModifier">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="width:100%; max-width:340px; background:#303030; color:#cccccc; font-family:sans-serif; border-radius:8px; overflow:hidden; border:1px solid #111; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
+            <div style="background:#282828; padding:10px 12px; font-size:13px; font-weight:700; border-bottom:1px solid #111; display:flex; gap:8px; align-items:center;">
+               <span style="color:#38bdf8;">🔧</span><span>${html(p.title)}</span><span style="margin-left:auto; opacity:0.5;">▼</span>
+            </div>
+            <div style="padding:10px;">
+               ${mods}
+               <div style="margin-top:8px; padding:6px; text-align:center; font-size:12px; background:#3d3d3d; border:1px solid #222; border-radius:4px; cursor:pointer;">Add Modifier ⌄</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  blenderOutliner: {
+    label: '📂 Blender Outliner', desc: 'Mimics the Hierarchy',
+    defaults: ()=>({
+      sceneName: 'Scene Collection',
+      collections: [
+        { name:'Environment', type:'col', items:['Ground', 'Lighting'] },
+        { name:'Superhive Result', type:'active', items:['Generated_City_01'] }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:60px 24px; background:#e5e7eb; border-radius:16px; display:flex; justify-content:center;',
+      style: ''
+    }),
+    render: (p)=> {
+      const cols = p.collections.map(c => `
+        <div style="padding:4px 8px 4px 24px; font-size:12px; display:flex; justify-content:space-between; background:#303030; cursor:pointer;">
+          <span style="display:flex; gap:6px; align-items:center; opacity:0.9;">
+            <span style="font-size:10px;">▼</span>
+            <span style="color:${c.type==='active'?'#eab308':'#ccc'};">📁</span>
+            <span style="color:${c.type==='active'?'#fff':'#ccc'};">${html(c.name)}</span>
+          </span>
+          <span style="display:flex; gap:8px; align-items:center; opacity:0.7;"><span>👁</span><span>📷</span></span>
+        </div>
+        ${(c.items||[]).map(i=>`
+          <div style="padding:4px 8px 4px 44px; font-size:12px; display:flex; justify-content:space-between; ${c.type==='active'?'background:#2a364a; color:#38bdf8;':'background:#303030; color:#aaa;'} border-left:1px dashed #444; margin-left:28px;">
+            <span style="display:flex; gap:6px; align-items:center;">
+              <span style="color:${c.type==='active'?'#38bdf8':'#ed8936'};">🟧</span>
+              <span>${html(i)}</span>
+            </span>
+            <span style="display:flex; gap:8px; align-items:center; opacity:${c.type==='active'?'1':'0.5'};"><span>👁</span><span>📷</span></span>
+          </div>
+        `).join('')}
+      `).join('');
+      return `
+      <div class="block" data-type="blenderOutliner">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="width:100%; max-width:340px; background:#303030; color:#cccccc; font-family:sans-serif; border-radius:8px; overflow:hidden; border:1px solid #111; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
+            <div style="background:#282828; padding:8px 12px; font-size:12px; border-bottom:1px solid #111; display:flex; justify-content:space-between;">
+               <span>🔍 Search...</span><span>▦</span>
+            </div>
+            <div style="padding:6px 8px; font-size:12px; display:flex; gap:6px; background:#3d3d3d; font-weight:600; color:#fff; align-items:center;">
+              <span style="font-size:10px; opacity:0.7;">▼</span><span>📦</span><span>${html(p.sceneName)}</span>
+            </div>
+            ${cols}
+            <div style="height:60px; background:#303030;"></div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  blenderAssets: {
+    label: '🖼️ Blender Assets', desc: 'Asset Browser UI Grid',
+    defaults: ()=>({
+      title: 'Current File',
+      items: [
+        { name:'SciFi Building A', img:'https://assets.superhivemarket.com/cache/5f525fcc03dd92e5709598c769bd480d.jpg' },
+        { name:'SciFi Building B', img:'https://assets.superhivemarket.com/cache/d49a5fb485d53d2f3605b9c3c1665e04.jpg' },
+        { name:'Street Prop', img:'https://assets.superhivemarket.com/cache/0cd9ee6fc0d0d7194b2f202c5ac8b86b.JPG' },
+        { name:'Neon Sign', img:'https://assets.superhivemarket.com/cache/d49a5fb485d53d2f3605b9c3c1665e04.jpg' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:40px 24px; background:#18181b; border-radius:16px;',
+      style: ''
+    }),
+    render: (p)=> {
+      const items = p.items.map(i=>`
+        <div style="background:#3d3d3d; border-radius:6px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #222; cursor:pointer;">
+          <div style="aspect-ratio:1/1; background:#222; overflow:hidden; border-bottom:1px solid #111;">
+            <img src="${attr(i.img)}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          </div>
+          <div style="padding:8px 6px; font-size:11px; color:#e5e7eb; text-align:center; font-family:sans-serif; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">${html(i.name)}</div>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="blenderAssets">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="width:100%; background:#282828; border-radius:8px; border:1px solid #111; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div style="background:#222; padding:10px 16px; font-family:sans-serif; font-size:13px; color:#aaa; display:flex; justify-content:space-between; border-bottom:1px solid #111;">
+               <span style="font-weight:700; color:#fff;">📚 ${html(p.title)}</span>
+               <span style="background:#111; padding:2px 12px; border-radius:12px; font-size:11px; border:1px solid #333;">🔍 Search Assets...</span>
+            </div>
+            <div style="padding:16px; display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:16px; max-height:400px; overflow-y:auto; background:#303030;">
+               ${items}
             </div>
           </div>
         </div>
@@ -1307,7 +1462,7 @@ function updateInspector(){
   }
   if(sel.type==='code'){
     f.appendChild(field('File Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
-    f.appendChild(textarea('Code Content',sel.props.code,(v)=>{ sel.props.code=v; render(); }));
+    f.appendChild(arrayEditor('Code Lines', ['text'], sel.props.lines, (a)=>{ sel.props.lines=a; render(); }));
   }
   if(sel.type==='faq'){
     f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
@@ -1380,6 +1535,21 @@ function updateInspector(){
     f.appendChild(field('Node Header Color','text',sel.props.nodeColor,(v)=>{ sel.props.nodeColor=v; render(); }));
     f.appendChild(textarea('Inputs (comma separated)',sel.props.inputs.join(', '),(v)=>{ sel.props.inputs=v.split(',').map(s=>s.trim()); render(); }));
     f.appendChild(textarea('Outputs (comma separated)',sel.props.outputs.join(', '),(v)=>{ sel.props.outputs=v.split(',').map(s=>s.trim()); render(); }));
+  }
+
+  if(sel.type==='blenderModifier'){
+    f.appendChild(field('Panel Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Modifiers', ['name','icon','active','expanded','details'], sel.props.items, (a)=>{ sel.props.items=a; render(); }));
+  }
+
+  if(sel.type==='blenderOutliner'){
+    f.appendChild(field('Scene Name','text',sel.props.sceneName,(v)=>{ sel.props.sceneName=v; render(); }));
+    f.appendChild(arrayEditor('Collections', ['name','type','items'], sel.props.collections, (a)=>{ sel.props.collections=a; render(); }));
+  }
+
+  if(sel.type==='blenderAssets'){
+    f.appendChild(field('Asset Folder','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Assets', ['name','img'], sel.props.items, (a)=>{ sel.props.items=a; render(); }));
   }
 
   if(sel.type==='spacer'){
