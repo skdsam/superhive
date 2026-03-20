@@ -6,8 +6,5 @@ export default {
     baseSurfaceStyle:'',
     style:''
   }),
-  render:(p, { mergeSurfaceStyle }) => `<div class="block" data-type="raw"><div data-surface="1" style="${mergeSurfaceStyle(p)}">${p.html}</div></div>`,
-  inspector: (f, p, render, { textarea }) => {
-    f.appendChild(textarea('Raw HTML', p.html,(v)=>{ p.html=v; render(); }));
-  }
+  render:(p, { mergeSurfaceStyle }) => `<div class="block" data-type="raw"><div data-surface="1" style="${mergeSurfaceStyle(p)}">${p.html}</div></div>`
 };

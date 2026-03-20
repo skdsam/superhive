@@ -13,9 +13,5 @@ export default {
         <h2 style="margin:0 0 10px 0;font-size:20px;">${html(p.title)}</h2>
         <p style="margin:0;">${html(p.text)}</p>
       </div>
-    </div>`,
-  inspector: (f, p, render, { field, textarea }) => {
-    f.appendChild(field('Heading','text',p.title,(v)=>{ p.title=v; render(); }));
-    f.appendChild(textarea('Paragraph', p.text,(v)=>{ p.text=v; render(); }));
-  }
+    </div>`
 };

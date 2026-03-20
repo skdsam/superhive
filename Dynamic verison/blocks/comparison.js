@@ -21,11 +21,5 @@ export default {
           <div style="position:absolute; bottom:12px; left:12px; background:rgba(59,130,246,0.8); color:#fff; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:700;">${html(p.rightLabel)}</div>
         </div>
       </div>
-    </div>`,
-  inspector: (f, p, render, { field }) => {
-    f.appendChild(field('Left Image URL','text',p.leftImg,(v)=>{ p.leftImg=v; render(); }));
-    f.appendChild(field('Left Label','text',p.leftLabel,(v)=>{ p.leftLabel=v; render(); }));
-    f.appendChild(field('Right Image URL','text',p.rightImg,(v)=>{ p.rightImg=v; render(); }));
-    f.appendChild(field('Right Label','text',p.rightLabel,(v)=>{ p.rightLabel=v; render(); }));
-  }
+    </div>`
 };

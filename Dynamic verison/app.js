@@ -1,9 +1,7 @@
-/* =========================
-   SuperHive Builder (Dynamic Version)
-   ========================= */
-
 const $  = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+import { shUI } from './sh_ui.js';
 
 /* -------------------------
    Global Definitions
@@ -58,6 +56,16 @@ async function initBlocks() {
       try {
         const mod = await import(`./blocks/${name}.js`);
         Blocks[name] = mod.default;
+        
+        // Try to load separate UI module
+        try {
+          const uiMod = await import(`./block_UI/${name}_UI.js`);
+          if (uiMod.default) {
+            Blocks[name].inspector = uiMod.default;
+          }
+        } catch (e) {
+          // If no separate UI file, it might still have internal inspector or none
+        }
       } catch (e) {
         console.error(`Failed to load block: ${name}`, e);
       }
@@ -83,127 +91,30 @@ const html = s => {
 };
 const attr = s => html(s).replace(/"/g, '&quot;');
 const mergeSurfaceStyle = (p) => {
-  const base = p.baseSurfaceStyle || '';
-  const over = p.style || '';
-  return base + (base.endsWith(';') || !base ? '' : ';') + over;
+  let s = p.baseSurfaceStyle || '';
+  if (p.margin) s += (s.endsWith(';') || !s ? '' : ';') + ` margin:${p.margin};`;
+  if (p.padding) s += (s.endsWith(';') || !s ? '' : ';') + ` padding:${p.padding};`;
+  if (p.bg) s += (s.endsWith(';') || !s ? '' : ';') + ` background:${p.bg};`;
+  if (p.border) s += (s.endsWith(';') || !s ? '' : ';') + ` border:${p.border};`;
+  if (p.radius) s += (s.endsWith(';') || !s ? '' : ';') + ` border-radius:${p.radius};`;
+  if (p.color) s += (s.endsWith(';') || !s ? '' : ';') + ` color:${p.color};`;
+  if (p.style) s += (s.endsWith(';') || !s ? '' : ';') + ` ${p.style};`;
+  return s.trim();
 };
 
 const shHelpers = { 
-  html, attr, mergeSurfaceStyle, 
-  field: (...args) => field(...args), 
-  textarea: (...args) => textarea(...args), 
-  arrayEditor: (...args) => arrayEditor(...args), 
-  addCountControls: (...args) => addCountControls(...args), 
-  ensureLength: (...args) => ensureLength(...args), 
+  html: shUI.html, 
+  attr: shUI.attr, 
+  mergeSurfaceStyle, 
+  field: (...args) => shUI.field(...args), 
+  textarea: (...args) => shUI.textarea(...args), 
+  select: (...args) => shUI.select(...args),
+  arrayEditor: (...args) => shUI.arrayEditor(...args, updateInspector), 
+  addCountControls: (...args) => shUI.addCountControls(...args), 
+  ensureLength: (...args) => shUI.ensureLength(...args), 
   openGlobalAddonsModal: (...args) => openGlobalAddonsModal(...args) 
 };
 window.shHelpers = shHelpers;
-
-/* -------------------------
-   UI Helpers
-------------------------- */
-function field(label, type, value, on){
-  const d = document.createElement('div'); d.className='field';
-  const isColor = label.toLowerCase().match(/(color|bg|background|tint|accent)/i);
-  
-  if (isColor) {
-    const hex = (value && typeof value === 'string' && value.match(/^#[0-9A-Fa-f]{6}$/)) ? value : '#000000';
-    const colorBox = `<input type="color" value="${hex}" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />`;
-    d.innerHTML = `<label>${label}</label><div style="display:flex; gap:6px;"><input type="${type}" value="${attr(value)}" style="flex:1;"/>${colorBox}</div>`;
-    
-    const textInp = d.querySelector(`input[type="${type}"]`);
-    const colInp = d.querySelector('input[type="color"]');
-    
-    textInp.addEventListener('input', e=> {
-      if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) { colInp.value = e.target.value; }
-      on(e.target.value);
-    });
-    colInp.addEventListener('input', e=> {
-      textInp.value = e.target.value;
-      on(e.target.value);
-    });
-  } else {
-    d.innerHTML = `<label>${label}</label><input type="${type}" value="${attr(value)}"/>`;
-    d.querySelector('input').addEventListener('input', e=> on(e.target.value));
-  }
-  return d;
-}
-
-function textarea(label, value, on){
-  const d = document.createElement('div'); d.className='field';
-  d.innerHTML = `<label>${label}</label><textarea>${html(value)}</textarea>`;
-  d.querySelector('textarea').addEventListener('input', e=> on(e.target.value));
-  return d;
-}
-
-function addCountControls(container, label, count, onChange){
-  const wrap = document.createElement('div'); wrap.className='field';
-  wrap.innerHTML = `<label>${label} (count)</label><input type="number" min="0" value="${count}">`;
-  wrap.querySelector('input').addEventListener('input', e=>{
-    const n = Math.max(0, parseInt(e.target.value||'0',10));
-    onChange(n);
-  });
-  container.appendChild(wrap);
-}
-
-function ensureLength(arr, n, makeItem){
-  const a = (arr || []).slice(0, n);
-  while(a.length < n) a.push(makeItem());
-  return a;
-}
-
-function arrayEditor(label, keys, arr, onChange){
-  const el = document.createElement('div'); el.className='field';
-  const l = document.createElement('label'); l.innerText = label; el.appendChild(l);
-  
-  const list = document.createElement('div'); list.style.marginTop='8px';
-  (arr||[]).forEach((item, idx) => {
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--panel2); border:1px solid var(--border); padding:8px; border-radius:6px; margin-bottom:8px; position:relative;';
-    
-    const btnDel = document.createElement('button');
-    btnDel.innerText = 'Delete';
-    btnDel.className = 'tool danger';
-    btnDel.style.cssText = 'font-size:10px; padding:2px 6px; cursor:pointer; float:right; margin-bottom:4px;';
-    btnDel.onclick = () => { arr.splice(idx, 1); onChange(arr); updateInspector(); };
-    card.appendChild(btnDel);
-
-    keys.forEach(k => {
-      const row = document.createElement('div'); row.style.marginBottom='6px'; row.style.clear='both';
-      const klabel = document.createElement('div'); klabel.innerText=k; klabel.style.cssText='font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:2px;';
-      const isLarge = k==='desc' || k==='text' || k==='code' || k==='a' || k==='details';
-      const inp = document.createElement(isLarge ? 'textarea' : 'input');
-      inp.value = Array.isArray(item[k]) ? item[k].join(', ') : item[k];
-      inp.style.cssText = `width:100%; box-sizing:border-box; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text); font-family:${k.includes('code')?'monospace':'inherit'};`;
-      if(isLarge) inp.style.height = '60px';
-      
-      inp.oninput = (e) => { 
-        if(Array.isArray(item[k])) item[k] = e.target.value.split(',').map(s=>s.trim());
-        else item[k] = e.target.value; 
-        onChange(arr); 
-      };
-      
-      row.appendChild(klabel); row.appendChild(inp);
-      card.appendChild(row);
-    });
-    list.appendChild(card);
-  });
-  el.appendChild(list);
-
-  const btnAdd = document.createElement('button');
-  btnAdd.innerText = '+ Add ' + label;
-  btnAdd.className = 'tool';
-  btnAdd.style.width = '100%';
-  btnAdd.onclick = () => { 
-    const nu = {}; keys.forEach(k=>{
-      if(k==='stars') nu[k]=5; else if(k==='highlight') nu[k]='false'; else if(k==='feats') nu[k]=['Feature']; else nu[k]='';
-    }); 
-    arr.push(nu); onChange(arr); updateInspector();
-  };
-  el.appendChild(btnAdd);
-  
-  return el;
-}
 
 /* -------------------------
    Render Loop
@@ -780,7 +691,12 @@ function openBGVariants(){
    Boot
 ------------------------- */
 function loadDefault(){
-  const order = ['hero','statTrio','overview','features6','media','youtube','updates','bullets','wow','imgRow3','ctaBanner','moreAddons'];
+  const preferred = ['hero','statTrio','overview','features6','media','youtube','updates','bullets','wow','imgRow3','ctaBanner','moreAddons'];
+  const all = Object.keys(Blocks);
+  const order = preferred.filter(p => all.includes(p));
+  // Add any remaining blocks that are not in the preferred list
+  all.forEach(k => { if(!order.includes(k)) order.push(k); });
+
   state.blocks = order.map(type => ({ id:uid(), type, props: Blocks[type].defaults() }));
   state.selectedId=null; render();
 }

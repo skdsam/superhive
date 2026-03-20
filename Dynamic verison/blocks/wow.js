@@ -1,73 +1,99 @@
 export default {
-  label: '🔥 Wow Factor Section',
-  desc: 'High-impact headline with glow',
+  label: '✨ Highlight / Wow',
+  desc: 'Eye-catching feature showcase',
   defaults: () => ({
-    badge: 'NEW RELEASE',
-    title: 'The Future of Lighting',
-    desc: 'Powered by advanced colour-extraction algorithms. Perfect for cinematic look-dev.',
+    badge: 'NEW UPDATE',
+    title: 'Meet Geometry Nodes 2.0',
+    desc: 'A completely rewritten computational framework that gives you full node-based control over the asset generation pipeline.',
     theme: 'neon-blue',
     layout: 'center-stacked',
-    baseSurfaceStyle: 'margin:0 0 32px 0;',
+    showEmoji: true,
+    emoji: '✨',
+    baseSurfaceStyle: 'margin:0 0 18px 0;',
     style: ''
   }),
-  render: (p, { mergeSurfaceStyle, html, attr }) => {
+  render: (p, { html, attr, mergeSurfaceStyle }) => {
     const themes = {
-      'neon-blue':     '--wow-acc:#3b82f6; --wow-bg:rgba(59,130,246,0.05);',
-      'cyber-pink' :   '--wow-acc:#ec4899; --wow-bg:rgba(236,72,153,0.05);',
-      'blender-orange':'--wow-acc:#ed8936; --wow-bg:rgba(237,137,54,0.05);',
-      'emerald-glow':  '--wow-acc:#10b981; --wow-bg:rgba(16,185,129,0.05);',
-      'royal-purple':  '--wow-acc:#8b5cf6; --wow-bg:rgba(139,92,246,0.05);',
-      'solar-flare':   '--wow-acc:#f59e0b; --wow-bg:rgba(245,158,11,0.05);',
-      'glitch-matrix':  '--wow-acc:#22c55e; --wow-bg:rgba(34,197,94,0.05);',
-      'midnight-slate': '--wow-acc:#64748b; --wow-bg:rgba(100,116,139,0.05);',
-      'glass-light':    '--wow-acc:#ffffff; --wow-bg:rgba(255,255,255,0.1);'
+      'neon-blue': { bg: '#0b0f19', border: '2px solid #2563eb', shadow: '0 0 40px rgba(37,99,235,0.25)', text: '#eff6ff', badgeBg: '#2563eb', badgeText: '#ffffff', glow: 'rgba(37,99,235,0.15)' },
+      'cyber-pink': { bg: '#180910', border: '2px solid #ec4899', shadow: '0 0 40px rgba(236,72,153,0.25)', text: '#fdf2f8', badgeBg: '#ec4899', badgeText: '#ffffff', glow: 'rgba(236,72,153,0.15)' },
+      'blender-orange': { bg: '#1c130d', border: '2px solid #ea580c', shadow: '0 0 40px rgba(234,88,12,0.25)', text: '#fff7ed', badgeBg: '#ea580c', badgeText: '#ffffff', glow: 'rgba(234,88,12,0.15)' },
+      'emerald-glow': { bg: '#062016', border: '2px solid #10b981', shadow: '0 0 40px rgba(16,185,129,0.25)', text: '#ecfdf5', badgeBg: '#10b981', badgeText: '#ffffff', glow: 'rgba(16,185,129,0.15)' },
+      'royal-purple': { bg: '#1c102a', border: '2px solid #8b5cf6', shadow: '0 0 40px rgba(139,92,246,0.25)', text: '#f5f3ff', badgeBg: '#8b5cf6', badgeText: '#ffffff', glow: 'rgba(139,92,246,0.15)' },
+      'solar-flare': { bg: '#2b1b08', border: '2px solid #f59e0b', shadow: '0 0 40px rgba(245,158,11,0.25)', text: '#fffbeb', badgeBg: '#f59e0b', badgeText: '#111111', glow: 'rgba(245,158,11,0.15)' },
+      'glitch-matrix': { bg: '#020617', border: '2px solid #22c55e', shadow: '0 0 40px rgba(34,197,94,0.25)', text: '#f0fdf4', badgeBg: '#22c55e', badgeText: '#000000', glow: 'rgba(34,197,94,0.15)' },
+      'midnight-slate': { bg: '#1e293b', border: '2px solid #475569', shadow: '0 10px 40px rgba(0,0,0,0.5)', text: '#f8fafc', badgeBg: '#3b82f6', badgeText: '#ffffff', glow: 'rgba(59,130,246,0.15)' },
+      'glass-light': { bg: '#ffffff', border: '2px solid #e5e7eb', shadow: '0 10px 30px rgba(0,0,0,0.05)', text: '#111827', badgeBg: '#f3f4f6', badgeText: '#374151', glow: 'rgba(0,0,0,0.05)' }
     };
     const t = themes[p.theme] || themes['neon-blue'];
-    const isLeft = p.layout === 'left-aligned';
-    const isSplit = p.layout === 'split-row';
+    const layout = p.layout || 'center-stacked';
+    const showEmoji = p.showEmoji !== false;
+    const emoji = p.emoji || '✨';
 
-    return `
-    <div class="block" data-type="wow" style="${t}">
-      <div data-surface="1" style="position:relative; border-radius:32px; padding:60px 40px; overflow:hidden; background:var(--wow-bg); border:1px solid rgba(255,255,255,0.1); ${mergeSurfaceStyle(p)}">
-        <div style="position:absolute; top:-100px; left:-100px; width:300px; height:300px; background:var(--wow-acc); filter:blur(120px); opacity:0.15; pointer-events:none;"></div>
-        <div style="position:relative; z-index:2; display:flex; flex-direction:${isSplit?'row':'column'}; align-items:${isLeft?'flex-start':'center'}; text-align:${isLeft?'left':'center'}; gap:24px; flex-wrap:wrap;">
-          <div style="flex:1; min-width:300px;">
-            <div style="display:inline-block; padding:6px 14px; border-radius:99px; background:rgba(255,255,255,0.05); border:1px solid var(--wow-acc); color:var(--wow-acc); font-size:12px; font-weight:800; letter-spacing:1px; margin-bottom:20px; text-transform:uppercase;">${html(p.badge)}</div>
-            <h2 style="font-size:clamp(32px, 5vw, 56px); font-weight:900; line-height:1.1; margin:0 0 20px 0; color:#fff;">${html(p.title)}</h2>
-            <p style="font-size:18px; color:rgba(255,255,255,0.7); max-width:600px; margin:${isLeft?'0':'0 auto'}; line-height:1.6;">${html(p.desc)}</p>
+    // Sparkle icon logic
+    const iconHtml = showEmoji ? `
+      <div style="margin-top:32px; display:flex; justify-content:inherit;">
+        <div style="width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, ${t.badgeBg} 0%, transparent 70%); display:flex; align-items:center; justify-content:center; position:relative; box-shadow:0 0 30px ${t.glow};">
+          <div style="width:100px; height:100px; border-radius:50%; background:rgba(255,255,255,0.05); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:40px;">
+            ${html(emoji)}
           </div>
-          ${isSplit ? `<div style="flex:0 0 200px; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:120px; border-radius:50%; border:2px solid var(--wow-acc); box-shadow:0 0 40px var(--wow-acc); display:flex; align-items:center; justify-content:center; color:var(--wow-acc); font-size:40px;">✨</div></div>` : ''}
+        </div>
+      </div>` : '';
+
+    let innerHtml = '';
+    if (layout === 'center-stacked') {
+      innerHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
+            <p style="margin:0 auto; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8;">${html(p.desc)}</p>
+            ${iconHtml}
+          </div>`;
+    } else if (layout === 'left-aligned') {
+      innerHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-start; text-align:left;">
+            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
+            <p style="margin:0; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8;">${html(p.desc)}</p>
+            <div style="width:100%; display:flex; justify-content:flex-start; transform: translateX(-10px);">${iconHtml}</div>
+          </div>`;
+    } else if (layout === 'right-aligned') {
+      innerHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-end; text-align:right;">
+            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
+            <p style="margin:0; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8;">${html(p.desc)}</p>
+            <div style="width:100%; display:flex; justify-content:flex-end; transform: translateX(10px);">${iconHtml}</div>
+          </div>`;
+    } else if (layout === 'split-row') {
+      innerHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:row; align-items:center; text-align:left; flex-wrap:wrap; gap:48px;">
+            <div style="flex:1.2; min-width:320px; align-self:center;">
+              <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+              <h2 style="margin:0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
+            </div>
+            <div style="flex:1; min-width:320px;">
+              <p style="margin:0; font-size:18px; line-height:1.6; opacity:0.8;">${html(p.desc)}</p>
+              <div style="width:100%; display:flex; justify-content:flex-start;">${iconHtml}</div>
+            </div>
+          </div>`;
+    }
+
+    let glowAlign = (layout === 'center-stacked') ? 'left:50%; transform:translate(-50%, -50%);' : 
+                   (layout === 'left-aligned' || layout === 'split-row') ? 'left:-50px; transform:translateY(-50%);' : 
+                   'right:-50px; transform:translateY(-50%);';
+
+    // Surface styles
+    const surfaceStyle = mergeSurfaceStyle(p);
+    
+    return `
+    <div class="block" data-type="wow">
+      <div data-surface="1" style="${attr(surfaceStyle)}">
+        <div style="border-radius:32px; padding:64px 48px; background:${t.bg}; border:${t.border}; box-shadow:${t.shadow}; color:${t.text}; position:relative; overflow:hidden;">
+          <!-- Subtle backdrop glow -->
+          <div style="position:absolute; top:50%; ${glowAlign} width:600px; height:600px; background:${t.badgeBg}; filter:blur(150px); opacity:0.1; border-radius:50%; pointer-events:none;"></div>
+          ${innerHtml}
         </div>
       </div>
     </div>`;
-  },
-  inspector: (f, p, render, { field, textarea }) => {
-    f.appendChild(field('Badge Text','text',p.badge,(v)=>{ p.badge=v; render(); }));
-    f.appendChild(field('Headline','text',p.title,(v)=>{ p.title=v; render(); }));
-    f.appendChild(textarea('Description',p.desc,(v)=>{ p.desc=v; render(); }));
-    
-    const themeWrap = document.createElement('div'); themeWrap.className='field';
-    themeWrap.innerHTML = `<label>Wow Theme</label><select>
-      <option value="neon-blue" ${p.theme==='neon-blue'?'selected':''}>Neon Blue</option>
-      <option value="cyber-pink" ${p.theme==='cyber-pink'?'selected':''}>Cyber Pink</option>
-      <option value="blender-orange" ${p.theme==='blender-orange'?'selected':''}>Blender Orange</option>
-      <option value="emerald-glow" ${p.theme==='emerald-glow'?'selected':''}>Emerald Glow</option>
-      <option value="royal-purple" ${p.theme==='royal-purple'?'selected':''}>Royal Purple</option>
-      <option value="solar-flare" ${p.theme==='solar-flare'?'selected':''}>Solar Flare</option>
-      <option value="glitch-matrix" ${p.theme==='glitch-matrix'?'selected':''}>Glitch Matrix</option>
-      <option value="midnight-slate" ${p.theme==='midnight-slate'?'selected':''}>Midnight Slate</option>
-      <option value="glass-light" ${p.theme==='glass-light'?'selected':''}>Glass Light</option>
-    </select>`;
-    themeWrap.querySelector('select').onchange = (e)=>{ p.theme = e.target.value; render(); };
-    f.appendChild(themeWrap);
-
-    const layoutWrap = document.createElement('div'); layoutWrap.className='field';
-    layoutWrap.innerHTML = `<label>Layout Style</label><select>
-      <option value="center-stacked" ${p.layout==='center-stacked'?'selected':''}>Center Stacked</option>
-      <option value="left-aligned" ${p.layout==='left-aligned'?'selected':''}>Left Aligned</option>
-      <option value="split-row" ${p.layout==='split-row'?'selected':''}>Split Row</option>
-    </select>`;
-    layoutWrap.querySelector('select').onchange = (e)=>{ p.layout = e.target.value; render(); };
-    f.appendChild(layoutWrap);
   }
 };

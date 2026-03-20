@@ -21,9 +21,5 @@ export default {
           ${p.bullets.map(b=>`<div><span style="color:#2a3566;margin-right:4px;">✔</span>${html(b)}</div>`).join('')}
         </div>
       </div>
-    </div>`,
-  inspector: (f, p, render, { field, textarea }) => {
-    f.appendChild(field('Title','text',p.title,(v)=>{ p.title=v; render(); }));
-    f.appendChild(textarea('Bullets', p.bullets.join('\n'),(v)=>{ p.bullets=v.split(/\n+/).filter(Boolean); render(); }));
-  }
+    </div>`
 };
