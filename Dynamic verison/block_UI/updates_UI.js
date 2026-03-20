@@ -8,18 +8,8 @@ export default (f, p, render, { field, arrayEditor }) => {
   f.appendChild(field('Version Color', 'text', p.versionColor, (v) => { p.versionColor = v; render(); }));
   f.appendChild(field('Notes Color', 'text', p.notesColor, (v) => { p.notesColor = v; render(); }));
   
-  // Transform notes from array to newline string for the editor
-  const editorItems = (p.items || []).map(it => ({
-    ...it,
-    notes: Array.isArray(it.notes) ? it.notes.join('\n') : (it.notes || '')
-  }));
-
-  f.appendChild(arrayEditor('Update Versions', ['v', 'notes'], editorItems, (a) => { 
-    p.items = a.map(it => ({
-      ...it,
-      // Transform notes from newline string back to list for the block
-      notes: typeof it.notes === 'string' ? it.notes.split(/\n+/).filter(Boolean) : (it.notes || [])
-    }));
+  f.appendChild(arrayEditor('Update Versions', ['v', 'notes'], p.items, (a) => { 
+    p.items = a;
     render(); 
   }));
 };

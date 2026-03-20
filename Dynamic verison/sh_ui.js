@@ -91,7 +91,7 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
     keys.forEach(k => {
       const row = document.createElement('div'); row.style.marginBottom='6px'; row.style.clear='both';
       const klabel = document.createElement('div'); klabel.innerText=k; klabel.style.cssText='font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:2px;';
-      const isLarge = k==='desc' || k==='text' || k==='code' || k==='a' || k==='details';
+      const isLarge = k==='desc' || k==='text' || k==='code' || k==='a' || k==='details' || k==='notes';
       const isColor = k.toLowerCase().match(/(color|bg|background|tint|accent)/i);
       
       const inpWrap = document.createElement('div');
@@ -99,12 +99,12 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
       inpWrap.style.gap = '6px';
       
       const inp = document.createElement(isLarge ? 'textarea' : 'input');
-      inp.value = Array.isArray(item[k]) ? item[k].join(', ') : item[k];
+      inp.value = Array.isArray(item[k]) ? item[k].join(isLarge ? '\n' : ', ') : (item[k] || '');
       inp.style.cssText = `flex:1; box-sizing:border-box; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text); font-family:${k.includes('code')?'monospace':'inherit'};`;
       if(isLarge) inp.style.height = '60px';
       
       inp.oninput = (e) => { 
-        if(Array.isArray(item[k])) item[k] = e.target.value.split(',').map(s=>s.trim());
+        if(Array.isArray(item[k])) item[k] = e.target.value.split(isLarge ? /\n+/ : ',').map(s=>s.trim()).filter(Boolean);
         else item[k] = e.target.value; 
         onChange(arr); 
       };
@@ -149,6 +149,7 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
       else if(k==='feats') nu[k]=['Feature']; 
       else if(k==='bgColor') nu[k]='#2a3566';
       else if(k==='textColor') nu[k]='#eaf0ff';
+      else if(k==='notes') nu[k]=['Note']; 
       else nu[k]='';
     }); 
     arr.push(nu); 
