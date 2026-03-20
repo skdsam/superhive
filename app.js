@@ -346,6 +346,241 @@ const Blocks = {
     }
   },
 
+  testimonials: {
+    label: '🗣️ Testimonials',
+    desc: 'Grid of user quotes and stars',
+    defaults: ()=>({
+      title: 'Loved by Creators',
+      reviews: [
+        { name:'Sarah K.', role:'3D Animator', text:'This addon cut my rendering time in half. Absolute lifesaver.', stars:5, thumb:'https://ui-avatars.com/api/?name=SK&background=0D8ABC&color=fff' },
+        { name:'John D.', role:'Environment Artist', text:'I use this on every single scene I build now. Highly recommended!', stars:5, thumb:'https://ui-avatars.com/api/?name=JD&background=10B981&color=fff' },
+        { name:'Marcus T.', role:'Indie Dev', text:'The best $20 I have spent on my workflow this year.', stars:5, thumb:'https://ui-avatars.com/api/?name=MT&background=F59E0B&color=fff' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:48px 24px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const cards = p.reviews.map(r => `
+        <div style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:24px; text-align:left; flex:1; min-width:280px; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
+          <div style="color:#fbbf24; font-size:18px; margin-bottom:12px;">${'★'.repeat(r.stars||5)}${'☆'.repeat(5-(r.stars||5))}</div>
+          <p style="margin:0 0 20px 0; font-size:15px; color:#374151; line-height:1.6; font-style:italic;">"${html(r.text)}"</p>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <img src="${attr(r.thumb)}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+            <div>
+              <div style="font-weight:700; color:#111827; font-size:14px;">${html(r.name)}</div>
+              <div style="font-size:12px; color:#6b7280;">${html(r.role)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="testimonials">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:28px; font-weight:800; color:#111827; margin:0 0 32px 0;">${html(p.title)}</h2>
+          <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+            ${cards}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  comparison: {
+    label: '⚖️ Before & After',
+    desc: 'Side-by-side images',
+    defaults: ()=>({
+      leftImg: 'https://via.placeholder.com/600x400/333333/888888?text=Before',
+      leftLabel: 'Without Addon',
+      rightImg: 'https://via.placeholder.com/600x400/2563eb/ffffff?text=After',
+      rightLabel: 'With Addon',
+      baseSurfaceStyle: 'margin:0 0 18px 0;',
+      style:''
+    }),
+    render: (p)=> `
+      <div class="block" data-type="comparison">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="display:flex; gap:16px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:280px; position:relative; overflow:hidden; border-radius:12px;">
+              <div style="position:absolute; top:12px; left:12px; background:rgba(0,0,0,0.6); color:#fff; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:700; backdrop-filter:blur(4px); z-index:2;">${html(p.leftLabel)}</div>
+              <img src="${attr(p.leftImg)}" style="width:100%; height:auto; display:block;">
+            </div>
+            <div style="flex:1; min-width:280px; position:relative; overflow:hidden; border-radius:12px;">
+              <div style="position:absolute; top:12px; left:12px; background:rgba(37,99,235,0.9); color:#fff; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:700; backdrop-filter:blur(4px); z-index:2;">${html(p.rightLabel)}</div>
+              <img src="${attr(p.rightImg)}" style="width:100%; height:auto; display:block;">
+            </div>
+          </div>
+        </div>
+      </div>`
+  },
+
+  steps: {
+    label: '🚶 How it Works',
+    desc: 'Numbered workflow steps',
+    defaults: ()=>({
+      title: 'Workflow in 3 Easy Steps',
+      steps: [
+        { num:'1', title:'Select Object', desc:'Select any mesh or object in your Blender scene.' },
+        { num:'2', title:'Apply Generator', desc:'Open the addon panel and click Generate.' },
+        { num:'3', title:'Adjust Sliders', desc:'Tweak the modifier values via the custom panel.' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:40px 24px; background:#fff; border:1px solid #e5e7eb; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const items = p.steps.map(s => `
+        <div style="display:flex; gap:20px; text-align:left; flex:1; min-width:240px; margin-bottom:24px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0;">${html(s.num)}</div>
+          <div>
+            <h3 style="margin:0 0 8px 0; font-size:18px; color:#111827; font-weight:700;">${html(s.title)}</h3>
+            <p style="margin:0; font-size:14px; color:#4b5563; line-height:1.6;">${html(s.desc)}</p>
+          </div>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="steps">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:28px; font-weight:800; color:#111827; margin:0 0 40px 0;">${html(p.title)}</h2>
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; max-width:900px; margin:0 auto;">
+            ${items}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  specs: {
+    label: '⚙️ Technical Specs',
+    desc: 'Compatibility grid',
+    defaults: ()=>({
+      title: 'System Requirements & Compatibility',
+      rows: [
+        { label:'Supported Versions', val:'Blender 3.6 LTS, 4.0, 4.1' },
+        { label:'Render Engines', val:'Cycles (Supported), Eevee (Supported)' },
+        { label:'Operating Systems', val:'Windows, macOS, Linux' },
+        { label:'Dependencies', val:'None (No external scripts required)' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:32px 0; background:#fefefe; border:1px solid #e5e7eb; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const trs = p.rows.map((r, i) => `
+        <div style="display:flex; flex-wrap:wrap; border-top:1px solid #e5e7eb; padding:16px 24px; background:${i%2===0 ? 'transparent' : '#f9fafb'};">
+          <div style="flex:1; min-width:150px; font-weight:700; color:#4b5563; font-size:14px;">${html(r.label)}</div>
+          <div style="flex:2; min-width:200px; color:#111827; font-size:15px; font-weight:500;">${html(r.val)}</div>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="specs">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:22px; font-weight:800; color:#111827; margin:0 0 24px 0;">${html(p.title)}</h2>
+          <div style="max-width:700px; margin:0 auto; border-bottom:1px solid #e5e7eb;">
+            ${trs}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  pricing: {
+    label: '💰 Pricing Matrix',
+    desc: 'Compare product tiers',
+    defaults: ()=>({
+      tiers: [
+        { name:'Standard License', price:'$15', desc:'For personal projects.', btn:'Buy Standard', highlight:'false', feats:['Full Features','1 User'] },
+        { name:'Studio License', price:'$45', desc:'For commercial work.', btn:'Buy Studio', highlight:'true', feats:['Full Features','Up to 5 Users','Priority Support'] }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:48px 24px; background:#fff; border:1px dashed #cbd5e1; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const cards = p.tiers.map(t => {
+        const lis = (t.feats||[]).map(f => `<li style="margin-bottom:12px; display:flex; align-items:flex-start; gap:8px;"><span style="color:#10b981; font-weight:800;">✓</span> <span>${html(f)}</span></li>`).join('');
+        const isHl = t.highlight==='true' || t.highlight===true;
+        const hlStyle = isHl ? 'border:2px solid #2563eb; box-shadow:0 20px 25px -5px rgba(37,99,235,0.1); transform:translateY(-8px);' : 'border:1px solid #e5e7eb; margin-top:8px;';
+        const badge = isHl ? `<div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#2563eb; color:#fff; font-size:12px; font-weight:800; padding:4px 12px; border-radius:99px; letter-spacing:1px; text-transform:uppercase;">Recommended</div>` : '';
+        const btnStyle = isHl ? 'background:#2563eb; color:#fff;' : 'background:#f3f4f6; color:#111827;';
+        
+        return `
+          <div style="flex:1; min-width:280px; max-width:380px; background:#fff; border-radius:16px; padding:32px 24px; position:relative; transition:transform 0.2s; ${hlStyle}">
+            ${badge}
+            <h3 style="margin:0 0 12px 0; font-size:20px; color:#111827; font-weight:700; text-align:center;">${html(t.name)}</h3>
+            <div style="text-align:center; font-size:48px; font-weight:800; color:#111827; margin-bottom:16px;">${html(t.price)}</div>
+            <p style="text-align:center; color:#6b7280; font-size:14px; margin:0 0 32px 0; min-height:40px;">${html(t.desc)}</p>
+            <ul style="list-style:none; padding:0; margin:0 0 32px 0; font-size:15px; color:#4b5563;">
+              ${lis}
+            </ul>
+            <a href="#" style="display:block; text-align:center; text-decoration:none; padding:14px; border-radius:8px; font-weight:700; font-size:16px; transition:opacity 0.2s; ${btnStyle}">${html(t.btn)}</a>
+          </div>
+        `;
+      }).join('');
+      return `
+      <div class="block" data-type="pricing">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="display:flex; flex-wrap:wrap; gap:32px; justify-content:center; align-items:stretch;">
+            ${cards}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  code: {
+    label: '💻 Code Snippet',
+    desc: 'Syntax highlighted box',
+    defaults: ()=>({
+      title: 'addon_script.py',
+      code: 'import bpy\n\n# Initialize the auto-generator\nbpy.ops.node.add_geometry_generator()\nprint("Node tree successfully created!")',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:24px; background:#0f111a; border:1px solid #1e2433; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.25);',
+      style:''
+    }),
+    render: (p)=> `
+      <div class="block" data-type="code">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a3143; padding-bottom:12px; margin-bottom:16px;">
+            <div style="display:flex; gap:6px;">
+              <div style="width:12px; height:12px; border-radius:50%; background:#ef4444;"></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:#f59e0b;"></div>
+              <div style="width:12px; height:12px; border-radius:50%; background:#10b981;"></div>
+            </div>
+            <div style="color:#94a3b8; font-family:monospace; font-size:12px;">${html(p.title)}</div>
+          </div>
+          <pre style="margin:0; padding:0; overflow-x:auto;"><code style="font-family:Consolas, Monaco, monospace; font-size:14px; color:#e2e8f0; line-height:1.5; white-space:pre;">${html(p.code)}</code></pre>
+        </div>
+      </div>`
+  },
+
+  faq: {
+    label: '❓ FAQ List',
+    desc: 'Stacked question/answers',
+    defaults: ()=>({
+      title: 'Frequently Asked Questions',
+      faqs: [
+        { q:'Does this work on Mac OS?', a:'Yes! The addon supports Windows, Mac OS, and Linux platforms completely.' },
+        { q:'Are future updates included?', a:'Absolutely. Once you purchase the Studio or Standard license, all minor updates are free forever.' },
+        { q:'Can I use generated assets commercially?', a:'Yes, any assets created using this addon are completely yours to use.' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:48px 24px; background:#fff; border:1px solid #e5e7eb; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const items = p.faqs.map(f => `
+        <div style="margin-bottom:24px; padding-bottom:24px; border-bottom:1px solid #f3f4f6;">
+          <h3 style="margin:0 0 8px 0; font-size:18px; color:#111827; font-weight:700;">${html(f.q)}</h3>
+          <p style="margin:0; font-size:15px; color:#4b5563; line-height:1.6;">${html(f.a)}</p>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="faq">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:28px; font-weight:800; color:#111827; margin:0 0 40px 0;">${html(p.title)}</h2>
+          <div style="max-width:800px; margin:0 auto;">
+            ${items}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
   ctaBanner: {
     label:'CTA Banner',
     desc:'Headline + sub + image',
@@ -555,6 +790,66 @@ function clearLayerDropLines() {
   $$('.layer-drop-line').forEach(el => el.remove());
 }
 
+function textarea(label, val, onChange){
+  const el = document.createElement('div'); el.className='field';
+  const l = document.createElement('label'); l.innerText = label;
+  const i = document.createElement('textarea'); i.value=val;
+  i.oninput = (e)=>onChange(e.target.value);
+  el.appendChild(l); el.appendChild(i); return el;
+}
+
+function arrayEditor(label, keys, arr, onChange){
+  const el = document.createElement('div'); el.className='field';
+  const l = document.createElement('label'); l.innerText = label; el.appendChild(l);
+  
+  const list = document.createElement('div'); list.style.marginTop='8px';
+  (arr||[]).forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--panel2); border:1px solid var(--border); padding:8px; border-radius:6px; margin-bottom:8px; position:relative;';
+    
+    const btnDel = document.createElement('button');
+    btnDel.innerText = 'Delete';
+    btnDel.style.cssText = 'font-size:10px; border:1px solid #fecaca; background:#fee2e2; color:#ef4444; border-radius:4px; padding:2px 6px; cursor:pointer; float:right; margin-bottom:4px;';
+    btnDel.onclick = () => { arr.splice(idx, 1); onChange(arr); updateInspector(); };
+    card.appendChild(btnDel);
+
+    keys.forEach(k => {
+      const row = document.createElement('div'); row.style.marginBottom='6px'; row.style.clear='both';
+      const klabel = document.createElement('div'); klabel.innerText=k; klabel.style.cssText='font-size:10px; color:var(--muted); text-transform:uppercase; margin-bottom:2px;';
+      const isLarge = k==='desc' || k==='text' || k==='code' || k==='a';
+      const inp = document.createElement(isLarge ? 'textarea' : 'input');
+      inp.value = Array.isArray(item[k]) ? item[k].join(', ') : item[k];
+      inp.style.cssText = `width:100%; box-sizing:border-box; padding:6px; font-size:12px; border:1px solid var(--border); border-radius:4px; background:var(--panel); color:var(--text); font-family:${k.includes('code')?'monospace':'inherit'};`;
+      if(isLarge) inp.style.height = '60px';
+      
+      inp.oninput = (e) => { 
+        if(Array.isArray(item[k])) item[k] = e.target.value.split(',').map(s=>s.trim());
+        else item[k] = e.target.value; 
+        onChange(arr); 
+      };
+      
+      row.appendChild(klabel); row.appendChild(inp);
+      card.appendChild(row);
+    });
+    list.appendChild(card);
+  });
+  el.appendChild(list);
+
+  const btnAdd = document.createElement('button');
+  btnAdd.innerText = '+ Add ' + label;
+  btnAdd.className = 'tool';
+  btnAdd.style.width = '100%';
+  btnAdd.onclick = () => { 
+    const nu = {}; keys.forEach(k=>{
+      if(k==='stars') nu[k]=5; else if(k==='highlight') nu[k]='false'; else if(k==='feats') nu[k]=['Feature']; else nu[k]='';
+    }); 
+    arr.push(nu); onChange(arr); updateInspector();
+  };
+  el.appendChild(btnAdd);
+  
+  return el;
+}
+
 function buildLibrary(){
   const list = $('#lib-list');
   list.innerHTML = '';
@@ -589,8 +884,8 @@ function render(){
   // tag ids
   let i=0; root.querySelectorAll('.block').forEach(el=>{ el.dataset.id = state.blocks[i++].id; });
   attachCanvasHandlers();
-  // keep selection
-  if(state.selectedId) selectBlock(state.selectedId);
+  // keep selection without completely destroying the inspector DOM to preserve input focus!
+  if(state.selectedId) selectBlock(state.selectedId, false);
   autosave();
   
   if(!$('#panel-layers').classList.contains('hidden')) {
@@ -603,11 +898,11 @@ function render(){
 ------------------------- */
 function getSelected(){ return state.blocks.find(b=>b.id===state.selectedId); }
 
-function selectBlock(id){
+function selectBlock(id, doUpdateInspector=true){
   state.selectedId = id;
   $$('#canvas .block').forEach(el=> el.classList.toggle('sel', el.dataset.id===id));
   $$('.layer-item').forEach(el=> el.classList.toggle('sel', el.dataset.id===id));
-  updateInspector();
+  if(doUpdateInspector) updateInspector();
 }
 
 function updateInspector(){
@@ -760,6 +1055,36 @@ function updateInspector(){
     </select>`;
     layoutWrap.querySelector('select').onchange = (e)=>{ sel.props.layout = e.target.value; render(); };
     f.appendChild(layoutWrap);
+  }
+  
+  if(sel.type==='testimonials'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Reviews', ['name','role','text','stars','thumb'], sel.props.reviews, (a)=>{ sel.props.reviews=a; render(); }));
+  }
+  if(sel.type==='comparison'){
+    f.appendChild(field('Left Image URL','text',sel.props.leftImg,(v)=>{ sel.props.leftImg=v; render(); }));
+    f.appendChild(field('Left Label','text',sel.props.leftLabel,(v)=>{ sel.props.leftLabel=v; render(); }));
+    f.appendChild(field('Right Image URL','text',sel.props.rightImg,(v)=>{ sel.props.rightImg=v; render(); }));
+    f.appendChild(field('Right Label','text',sel.props.rightLabel,(v)=>{ sel.props.rightLabel=v; render(); }));
+  }
+  if(sel.type==='steps'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Steps', ['num','title','desc'], sel.props.steps, (a)=>{ sel.props.steps=a; render(); }));
+  }
+  if(sel.type==='specs'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Rows', ['label','val'], sel.props.rows, (a)=>{ sel.props.rows=a; render(); }));
+  }
+  if(sel.type==='pricing'){
+    f.appendChild(arrayEditor('Tiers', ['name','price','desc','btn','highlight','feats'], sel.props.tiers, (a)=>{ sel.props.tiers=a; render(); }));
+  }
+  if(sel.type==='code'){
+    f.appendChild(field('File Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(textarea('Code Content',sel.props.code,(v)=>{ sel.props.code=v; render(); }));
+  }
+  if(sel.type==='faq'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Questions', ['q','a'], sel.props.faqs, (a)=>{ sel.props.faqs=a; render(); }));
   }
 
   if(sel.type==='ctaBanner'){
