@@ -149,7 +149,8 @@ header.appbar #btn-global-addons:hover { background: #eff6ff; }
 /* Canvas */
 .canvas-wrap { padding: 24px 24px 120px; }
 .canvas { margin: 0 auto; max-width: var(--maxw); outline: 0; position: relative; min-height: 400px; }
-.block { position: relative; }
+.block { position: relative; margin-bottom: 40px; }
+.block.sel { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 8px; }
 .sel { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
 .ghost { opacity: .4; }
 .drop-line { height: 4px; background: var(--accent); border-radius: 2px; margin: 10px 0; box-shadow: 0 0 8px rgba(37,99,235,0.4); }
