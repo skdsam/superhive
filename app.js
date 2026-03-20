@@ -52,7 +52,7 @@ const uid = () => 'b_' + Math.random().toString(36).slice(2, 9);
 ------------------------- */
 const Blocks = {
   hero: {
-    label: 'Hero Header',
+    label: '🚀 Hero Header',
     desc: 'Logo/GIF, title, subtitle, badges',
     defaults: () => ({
       title: 'ChromaLight',
@@ -87,7 +87,7 @@ const Blocks = {
   },
 
   statTrio: {
-    label:'Stats Trio',
+    label:'📊 Stats Trio',
     desc:'Blender versions, Platforms, Includes',
     defaults: () => ({
       items:[
@@ -118,7 +118,7 @@ const Blocks = {
   },
 
   overview: {
-    label:'Overview Box',
+    label:'📝 Overview Box',
     desc:'h2 + paragraph',
     defaults:()=>({
       title:'Overview',
@@ -136,7 +136,7 @@ const Blocks = {
   },
 
   features6: {
-    label:'Six Feature Grid',
+    label:'✨ Six Feature Grid',
     desc:'6 cards with title + desc',
     defaults:()=>({
       cards:[
@@ -170,7 +170,7 @@ const Blocks = {
   },
 
   media: {
-    label:'Media Panel',
+    label:'📷 Media Panel',
     desc:'Single image/GIF',
     defaults:()=>({
       src:'https://assets.superhivemarket.com/cache/04ebdd07537f7103c5b4b0e6bfda8814.gif',
@@ -187,7 +187,7 @@ const Blocks = {
   },
 
   youtube: {
-    label:'YouTube Embed',
+    label:'📺 YouTube Embed',
     desc:'16:9 iframe',
     defaults:()=>({
       url:'https://www.youtube-nocookie.com/embed/fSUy4PF8ReI',
@@ -205,7 +205,7 @@ const Blocks = {
   },
 
   updates: {
-    label:'Updates List',
+    label:'🔔 Updates List',
     desc:'Version bullets',
     defaults:()=>({
       items:[
@@ -228,7 +228,7 @@ const Blocks = {
   },
 
   bullets: {
-    label:'Bulleted Highlights',
+    label:'📋 Bulleted Highlights',
     desc:'Simple UL',
     defaults:()=>({
       title:'Adjust and amend to create new lighting moods and concept art',
@@ -250,7 +250,7 @@ const Blocks = {
   },
 
   imgRow3: {
-    label:'Image Row',
+    label:'🖼️ Image Row',
     desc:'N images inline (editable count & wrap constraints)',
     defaults:()=>({
       imgs:[
@@ -389,9 +389,9 @@ const Blocks = {
     label: '⚖️ Before & After',
     desc: 'Side-by-side images',
     defaults: ()=>({
-      leftImg: 'https://via.placeholder.com/600x400/333333/888888?text=Before',
+      leftImg: 'https://assets.superhivemarket.com/cache/5f525fcc03dd92e5709598c769bd480d.jpg',
       leftLabel: 'Without Addon',
-      rightImg: 'https://via.placeholder.com/600x400/2563eb/ffffff?text=After',
+      rightImg: 'https://assets.superhivemarket.com/cache/d49a5fb485d53d2f3605b9c3c1665e04.jpg',
       rightLabel: 'With Addon',
       baseSurfaceStyle: 'margin:0 0 18px 0;',
       style:''
@@ -424,12 +424,14 @@ const Blocks = {
         { num:'3', title:'Adjust Sliders', desc:'Tweak the modifier values via the custom panel.' }
       ],
       baseSurfaceStyle: 'margin:0 0 18px 0; padding:40px 24px; background:#fff; border:1px solid #e5e7eb; border-radius:16px;',
-      style:''
+      style:'',
+      circleBg: '#2563eb',
+      circleColor: '#ffffff'
     }),
     render: (p)=> {
       const items = p.steps.map(s => `
         <div style="display:flex; gap:20px; text-align:left; flex:1; min-width:240px; margin-bottom:24px;">
-          <div style="width:40px; height:40px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0;">${html(s.num)}</div>
+          <div style="width:40px; height:40px; border-radius:50%; background:${p.circleBg || '#2563eb'}; color:${p.circleColor || '#ffffff'}; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0;">${html(s.num)}</div>
           <div>
             <h3 style="margin:0 0 8px 0; font-size:18px; color:#111827; font-weight:700;">${html(s.title)}</h3>
             <p style="margin:0; font-size:14px; color:#4b5563; line-height:1.6;">${html(s.desc)}</p>
@@ -582,7 +584,7 @@ const Blocks = {
   },
 
   ctaBanner: {
-    label:'CTA Banner',
+    label:'📢 CTA Banner',
     desc:'Headline + sub + image',
     defaults:()=>({
       headline:'Match your scene to your mood.',
@@ -609,8 +611,209 @@ const Blocks = {
       </div>`
   },
 
+  bentoGrid: {
+    label: '🍱 Bento Grid', desc: 'Asymmetrical features',
+    defaults: ()=>({
+      c1_title: 'Procedural Generation', c1_desc: 'Instantly build sprawling cities.', c1_img:'https://assets.superhivemarket.com/cache/5f525fcc03dd92e5709598c769bd480d.jpg',
+      c2_title: '1-Click Export', c2_desc: 'Ready for Unreal Engine.', c2_img:'https://assets.superhivemarket.com/cache/0cd9ee6fc0d0d7194b2f202c5ac8b86b.JPG',
+      c3_title: 'Non-Destructive', c3_desc: 'Always editable at any time.',
+      c4_title: 'Optimized', c4_desc: 'Perfect for massive scenes.',
+      baseSurfaceStyle: 'margin:0 0 18px 0;',
+      style: ''
+    }),
+    render: (p)=> {
+      const id = 'bento-' + Math.random().toString(36).slice(2, 9);
+      return `
+      <div class="block" data-type="bentoGrid">
+        <style>
+          #${id} { display:grid; grid-template-columns:2fr 1fr; gap:16px; auto-rows: minmax(180px, auto); }
+          #${id} .b-card { background:#fff; border:1px solid #e5e7eb; border-radius:24px; padding:24px; display:flex; flex-direction:column; overflow:hidden; position:relative; box-shadow:0 10px 15px -3px rgba(0,0,0,0.02); }
+          #${id} .b-card h3 { margin:0 0 8px 0; font-size:20px; font-weight:800; color:#111827; position:relative; z-index:2; }
+          #${id} .b-card p { margin:0; font-size:15px; color:#4b5563; position:relative; z-index:2; line-height:1.5; }
+          #${id} .c1 { grid-column:span 1; grid-row:span 2; min-height:400px; justify-content:flex-end; }
+          #${id} .c2 { grid-column:span 1; grid-row:span 1; min-height:200px; justify-content:flex-end; }
+          #${id} .c34-wrap { grid-column:span 1; grid-row:span 1; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+          #${id} .bg-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+          #${id} .overlay { position:absolute; bottom:0; left:0; width:100%; height:60%; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); z-index:1; }
+          @media(max-width:768px) { #${id}, #${id} .c34-wrap { grid-template-columns:1fr; } #${id} .c1 { grid-row:span 1; min-height:300px; } }
+        </style>
+        <div id="${id}" data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div class="b-card c1">
+            ${p.c1_img ? `<img src="${attr(p.c1_img)}" class="bg-img"><div class="overlay"></div>` : ''}
+            <h3 style="${p.c1_img?'color:#fff;':''}">${html(p.c1_title)}</h3>
+            <p style="${p.c1_img?'color:#e5e7eb;':''}">${html(p.c1_desc)}</p>
+          </div>
+          <div class="b-card c2">
+            ${p.c2_img ? `<img src="${attr(p.c2_img)}" class="bg-img"><div class="overlay"></div>` : ''}
+            <h3 style="${p.c2_img?'color:#fff;':''}">${html(p.c2_title)}</h3>
+            <p style="${p.c2_img?'color:#e5e7eb;':''}">${html(p.c2_desc)}</p>
+          </div>
+          <div class="c34-wrap">
+            <div class="b-card c3">
+              <h3>${html(p.c3_title)}</h3><p>${html(p.c3_desc)}</p>
+            </div>
+            <div class="b-card c4">
+              <h3>${html(p.c4_title)}</h3><p>${html(p.c4_desc)}</p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  proConList: {
+    label: '🚦 Old Way vs Addon', desc: 'Compare manual vs automated',
+    defaults: ()=>({
+      title: 'Stop Wasting Time',
+      oldTitle: 'The Old Way',
+      oldDesc: 'Hours of tedious manual work',
+      oldItems: ['Manually unwrap UVs', 'Bake textures map by map', 'Guess lighting values', 'Wait for slow renders'],
+      newTitle: 'The Superhive Way',
+      newDesc: 'Results in 30 seconds',
+      newItems: ['1-Click Smart UVs', 'Auto-bake all channels', 'Procedural sky lighting', 'Real-time Eevee previews'],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:24px;',
+      style: ''
+    }),
+    render: (p)=> {
+      const olds = p.oldItems.map(i=>`<li style="margin-bottom:12px; display:flex; align-items:flex-start; gap:12px;"><div style="width:20px;height:20px;background:#fef2f2;color:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;margin-top:2px;">✕</div> <span style="opacity:0.8;">${html(i)}</span></li>`).join('');
+      const news = p.newItems.map(i=>`<li style="margin-bottom:12px; display:flex; align-items:flex-start; gap:12px;"><div style="width:20px;height:20px;background:#10b981;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;margin-top:2px;box-shadow:0 0 10px rgba(16,185,129,0.4);">✓</div> <span style="font-weight:500;">${html(i)}</span></li>`).join('');
+      return `
+      <div class="block" data-type="proConList">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:28px; font-weight:800; color:#111827; margin:0 0 32px 0;">${html(p.title)}</h2>
+          <div style="display:flex; flex-wrap:wrap; gap:24px;">
+            <div style="flex:1; min-width:280px; background:#fafafa; border:1px solid #f3f4f6; border-radius:24px; padding:32px;">
+              <h3 style="margin:0 0 8px 0; font-size:22px; color:#6b7280; font-weight:700;">${html(p.oldTitle)}</h3>
+              <p style="margin:0 0 24px 0; color:#9ca3af; font-size:15px;">${html(p.oldDesc)}</p>
+              <ul style="list-style:none; padding:0; margin:0; color:#4b5563;">${olds}</ul>
+            </div>
+            <div style="flex:1; min-width:280px; background:#ecfdf5; border:1px solid #10b981; border-radius:24px; padding:32px; position:relative; box-shadow:0 20px 25px -5px rgba(16,185,129,0.1);">
+              <div style="position:absolute; top:-12px; right:32px; background:#10b981; color:#fff; font-size:12px; font-weight:800; padding:4px 12px; border-radius:99px; letter-spacing:1px; text-transform:uppercase;">Recommended</div>
+              <h3 style="margin:0 0 8px 0; font-size:22px; color:#065f46; font-weight:800;">${html(p.newTitle)}</h3>
+              <p style="margin:0 0 24px 0; color:#059669; font-size:15px;">${html(p.newDesc)}</p>
+              <ul style="list-style:none; padding:0; margin:0; color:#064e3b;">${news}</ul>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  gradientHero: {
+    label: '✨ Animated Gradient Hero', desc: 'Massive colorful title',
+    defaults: ()=>({
+      title: 'Design at the speed of thought.',
+      subtitle: 'The ultimate tool for Blender artists building sci-fi environments.',
+      btnText: 'Get Early Access',
+      btnHref: '#',
+      gradA: '#ec4899', gradB: '#8b5cf6', gradC: '#3b82f6',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:80px 24px; text-align:center; background:#020617; border-image:linear-gradient(to right, #ec4899, #3b82f6) 1; border-width:1px; border-style:solid; border-radius:24px; color:#f8fafc; overflow:hidden; position:relative;',
+      style: ''
+    }),
+    render: (p)=> {
+      const id = 'grad-' + Math.random().toString(36).slice(2, 9);
+      return `
+      <div class="block" data-type="gradientHero">
+        <style>
+          @keyframes anim_${id} { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+          #${id}-text { background: linear-gradient(90deg, ${p.gradA}, ${p.gradB}, ${p.gradC}, ${p.gradA}); background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: anim_${id} 4s linear infinite; }
+          #${id}-btn { background: linear-gradient(90deg, ${p.gradA}, ${p.gradB}); transition:opacity 0.2s, transform 0.2s; }
+          #${id}-btn:hover { opacity:0.9; transform:scale(1.05); }
+        </style>
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(circle at 50% 50%, ${attr(p.gradB)}33 0%, transparent 50%); z-index:0; pointer-events:none;"></div>
+          <div style="position:relative; z-index:1; max-width:800px; margin:0 auto;">
+            <h1 id="${id}-text" style="font-size: clamp(40px, 6vw, 72px); font-weight:900; line-height:1.1; margin:0 0 24px 0; padding-bottom:8px;">${html(p.title)}</h1>
+            <p style="font-size:20px; color:#94a3b8; margin:0 0 40px 0; line-height:1.6;">${html(p.subtitle)}</p>
+            <a id="${id}-btn" href="${attr(p.btnHref)}" style="display:inline-block; color:#fff; text-decoration:none; padding:16px 32px; border-radius:99px; font-weight:800; font-size:18px; box-shadow:0 10px 25px ${attr(p.gradA)}66;">${html(p.btnText)}</a>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  roadmap: {
+    label: '🗺️ Product Roadmap', desc: 'Timeline of updates',
+    defaults: ()=>({
+      title: 'Development Timeline',
+      steps: [
+        { version:'v1.0', title:'Initial Release', desc:'Core features and geometry nodes setup.', status:'done' },
+        { version:'v1.5', title:'Performance Update', desc:'5x faster generation and new UI.', status:'current' },
+        { version:'v2.0', title:'Eevee Next Support', desc:'Full compatibility with upcoming Blender 4.2 features.', status:'upcoming' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:48px 24px; background:#fff; border:1px solid #e2e6f4; border-radius:24px;',
+      style: ''
+    }),
+    render: (p)=> {
+      const items = p.steps.map((s, idx) => {
+        let dotColor = '#e5e7eb';
+        let titleColor = '#9ca3af';
+        let activeGlow = '';
+        if(s.status==='done') { dotColor = '#10b981'; titleColor = '#111827'; }
+        if(s.status==='current') { dotColor = '#3b82f6'; titleColor = '#111827'; activeGlow = 'box-shadow:0 0 0 4px rgba(59,130,246,0.2);'; }
+        
+        return `
+        <div style="position:relative; margin-bottom:${idx===p.steps.length-1?'0':'32px'}; clear:both;">
+          <div style="position:absolute; left:-33px; top:4px; width:16px; height:16px; border-radius:50%; background:${dotColor}; ${activeGlow}"></div>
+          <div style="float:left; width:60px; font-weight:800; color:${dotColor}; font-size:14px; margin-top:2px;">${html(s.version)}</div>
+          <div style="margin-left:70px;">
+            <h3 style="margin:0 0 4px 0; font-size:18px; font-weight:800; color:${titleColor};">${html(s.title)}</h3>
+            <p style="margin:0; font-size:15px; color:#4b5563; line-height:1.5;">${html(s.desc)}</p>
+          </div>
+        </div>`;
+      }).join('');
+      return `
+      <div class="block" data-type="roadmap">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:28px; font-weight:800; color:#111827; margin:0 0 40px 0;">${html(p.title)}</h2>
+          <div style="max-width:600px; margin:0 auto; padding-left:24px; border-left:2px solid #e5e7eb;">
+            ${items}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  fauxNode: {
+    label: '🧩 Blender Node UI', desc: 'Mimics the Node Editor',
+    defaults: ()=>({
+      nodeTitle: 'Superhive Generator',
+      nodeColor: '#3b82f6',
+      inputs: ['Geometry', 'Seed', 'Density'],
+      outputs: ['Mesh', 'Materials'],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:60px 24px; background:#1e1e1e; border-radius:16px; display:flex; justify-content:center; overflow:hidden;',
+      style: ''
+    }),
+    render: (p)=> {
+      const ins = p.inputs.map(i=>`<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; position:relative; left:-6px;"><div style="width:12px;height:12px;border-radius:50%;border:1px solid #000;background:#38bdf8;"></div><span style="color:#d1d5db;font-size:14px;">${html(i)}</span></div>`).join('');
+      const outs = p.outputs.map(i=>`<div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:8px; position:relative; right:-6px;"><span style="color:#d1d5db;font-size:14px;">${html(i)}</span><div style="width:12px;height:12px;border-radius:50%;border:1px solid #000;background:#10b981;"></div></div>`).join('');
+      return `
+      <div class="block" data-type="fauxNode">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="width:100%; max-width:320px; background:#333333; border:1px solid #111; border-radius:8px; overflow:hidden; box-shadow:0 15px 30px rgba(0,0,0,0.5); font-family:sans-serif;">
+            <div style="background:linear-gradient(to right, ${attr(p.nodeColor)} 0%, #475569 50%, #333333 100%); padding:10px 16px; color:#fff; font-weight:700; font-size:15px; text-shadow:0 1px 2px rgba(0,0,0,0.5); display:flex; justify-content:space-between;">
+              <span>▼ ${html(p.nodeTitle)}</span>
+            </div>
+            <div style="padding:16px; display:flex; justify-content:space-between; background:#3b3b3b; position:relative;">
+              
+              <!-- Faux input wires -->
+              <svg style="position:absolute; right:100%; top:24px; width:60px; height:120px; overflow:visible; pointer-events:none; opacity:0.6;"><path d="M-60,0 C-20,0 -10,0 0,0" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/></svg>
+
+              <div>${ins}</div>
+              <div style="text-align:right;">${outs}</div>
+              
+              <!-- Faux output wires -->
+              <svg style="position:absolute; left:100%; top:24px; width:60px; height:120px; overflow:visible; pointer-events:none; opacity:0.6;"><path d="M0,0 C20,0 40,30 60,30" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
   moreAddons: {
-    label:'More Add-ons Grid',
+    label:'🧩 More Add-ons Grid',
     desc:'Cards linked directly to Global Template',
     defaults:()=>({
       introTitle:'Discover more Blender add-ons',
@@ -650,8 +853,30 @@ const Blocks = {
       </div>`
   },
 
+  spacer: {
+    label: '⬍ Empty Spacer', desc: 'Vertical blank space',
+    defaults:()=>({
+      height: '40px',
+      baseSurfaceStyle: '',
+      style: ''
+    }),
+    render: (p)=> `<div class="block" data-type="spacer"><div data-surface="1" style="height:${attr(p.height)}; ${attr(mergeSurfaceStyle(p))}"></div></div>`
+  },
+
+  divider: {
+    label: '➖ Divider Line', desc: 'Horizontal rule',
+    defaults:()=>({
+      color: '#e5e7eb',
+      thickness: '1px',
+      margin: '32px 0',
+      baseSurfaceStyle: '',
+      style: ''
+    }),
+    render: (p)=> `<div class="block" data-type="divider"><div data-surface="1" style="padding:1px; ${attr(mergeSurfaceStyle(p))}"><hr style="border:none; border-top:${attr(p.thickness)} solid ${attr(p.color)}; margin:${attr(p.margin)}; width:100%;"></div></div>`
+  },
+
   raw: {
-    label:'Raw HTML', desc:'Paste custom snippet',
+    label:'📜 Raw HTML', desc:'Paste custom snippet',
     defaults:()=>({
       html:'<div style="padding:16px;border:1px dashed #e2e6f4;border-radius:12px;background:#fff;color:#0f1220;">Custom HTML…</div>',
       baseSurfaceStyle:'',
@@ -1069,6 +1294,8 @@ function updateInspector(){
   }
   if(sel.type==='steps'){
     f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(field('Circle Background','text',sel.props.circleBg || '#2563eb',(v)=>{ sel.props.circleBg=v; render(); }));
+    f.appendChild(field('Circle Text Color','text',sel.props.circleColor || '#ffffff',(v)=>{ sel.props.circleColor=v; render(); }));
     f.appendChild(arrayEditor('Steps', ['num','title','desc'], sel.props.steps, (a)=>{ sel.props.steps=a; render(); }));
   }
   if(sel.type==='specs'){
@@ -1108,6 +1335,61 @@ function updateInspector(){
     notice.innerHTML = `<label>Global Config</label><button class="tool" style="width:100%; border-color:var(--accent); color:var(--accent);">Edit Global Add-ons Template</button>`;
     notice.querySelector('button').onclick = () => openGlobalAddonsModal();
     f.appendChild(notice);
+  }
+
+  if(sel.type==='bentoGrid'){
+    f.appendChild(field('Card 1 Title','text',sel.props.c1_title,(v)=>{ sel.props.c1_title=v; render(); }));
+    f.appendChild(textarea('Card 1 Desc',sel.props.c1_desc,(v)=>{ sel.props.c1_desc=v; render(); }));
+    f.appendChild(field('Card 1 Img URL','text',sel.props.c1_img,(v)=>{ sel.props.c1_img=v; render(); }));
+    f.appendChild(field('Card 2 Title','text',sel.props.c2_title,(v)=>{ sel.props.c2_title=v; render(); }));
+    f.appendChild(textarea('Card 2 Desc',sel.props.c2_desc,(v)=>{ sel.props.c2_desc=v; render(); }));
+    f.appendChild(field('Card 2 Img URL','text',sel.props.c2_img,(v)=>{ sel.props.c2_img=v; render(); }));
+    f.appendChild(field('Card 3 Title','text',sel.props.c3_title,(v)=>{ sel.props.c3_title=v; render(); }));
+    f.appendChild(textarea('Card 3 Desc',sel.props.c3_desc,(v)=>{ sel.props.c3_desc=v; render(); }));
+    f.appendChild(field('Card 4 Title','text',sel.props.c4_title,(v)=>{ sel.props.c4_title=v; render(); }));
+    f.appendChild(textarea('Card 4 Desc',sel.props.c4_desc,(v)=>{ sel.props.c4_desc=v; render(); }));
+  }
+
+  if(sel.type==='proConList'){
+    f.appendChild(field('Main Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(field('Old Title','text',sel.props.oldTitle,(v)=>{ sel.props.oldTitle=v; render(); }));
+    f.appendChild(textarea('Old Desc',sel.props.oldDesc,(v)=>{ sel.props.oldDesc=v; render(); }));
+    f.appendChild(textarea('Old Items (comma separated)',sel.props.oldItems.join(', '),(v)=>{ sel.props.oldItems=v.split(',').map(s=>s.trim()); render(); }));
+    f.appendChild(field('New Title','text',sel.props.newTitle,(v)=>{ sel.props.newTitle=v; render(); }));
+    f.appendChild(textarea('New Desc',sel.props.newDesc,(v)=>{ sel.props.newDesc=v; render(); }));
+    f.appendChild(textarea('New Items (comma separated)',sel.props.newItems.join(', '),(v)=>{ sel.props.newItems=v.split(',').map(s=>s.trim()); render(); }));
+  }
+
+  if(sel.type==='gradientHero'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(textarea('Subtitle',sel.props.subtitle,(v)=>{ sel.props.subtitle=v; render(); }));
+    f.appendChild(field('Button Text','text',sel.props.btnText,(v)=>{ sel.props.btnText=v; render(); }));
+    f.appendChild(field('Button URL','text',sel.props.btnHref,(v)=>{ sel.props.btnHref=v; render(); }));
+    f.appendChild(field('Gradient Color 1','text',sel.props.gradA,(v)=>{ sel.props.gradA=v; render(); }));
+    f.appendChild(field('Gradient Color 2','text',sel.props.gradB,(v)=>{ sel.props.gradB=v; render(); }));
+    f.appendChild(field('Gradient Color 3','text',sel.props.gradC,(v)=>{ sel.props.gradC=v; render(); }));
+  }
+
+  if(sel.type==='roadmap'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(arrayEditor('Steps', ['version','title','desc','status'], sel.props.steps, (a)=>{ sel.props.steps=a; render(); }));
+  }
+
+  if(sel.type==='fauxNode'){
+    f.appendChild(field('Node Title','text',sel.props.nodeTitle,(v)=>{ sel.props.nodeTitle=v; render(); }));
+    f.appendChild(field('Node Header Color','text',sel.props.nodeColor,(v)=>{ sel.props.nodeColor=v; render(); }));
+    f.appendChild(textarea('Inputs (comma separated)',sel.props.inputs.join(', '),(v)=>{ sel.props.inputs=v.split(',').map(s=>s.trim()); render(); }));
+    f.appendChild(textarea('Outputs (comma separated)',sel.props.outputs.join(', '),(v)=>{ sel.props.outputs=v.split(',').map(s=>s.trim()); render(); }));
+  }
+
+  if(sel.type==='spacer'){
+    f.appendChild(field('Height (px, rem)', 'text', sel.props.height, (v)=>{ sel.props.height=v; render(); }));
+  }
+
+  if(sel.type==='divider'){
+    f.appendChild(field('Line Color', 'text', sel.props.color, (v)=>{ sel.props.color=v; render(); }));
+    f.appendChild(field('Thickness', 'text', sel.props.thickness, (v)=>{ sel.props.thickness=v; render(); }));
+    f.appendChild(field('Margin', 'text', sel.props.margin, (v)=>{ sel.props.margin=v; render(); }));
   }
 
   if(sel.type==='raw'){
