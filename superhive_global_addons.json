@@ -1,0 +1,42 @@
+[
+  {
+    "href": "https://superhivemarket.com/products/collection-compactor",
+    "img": "https://assets.superhivemarket.com/cache/0cd9ee6fc0d0d7194b2f202c5ac8b86b.JPG",
+    "title": "Collection Compactor",
+    "sub": "Hide/show collections, compact the Outliner, search hidden items.",
+    "tags": [
+      "Outliner",
+      "Blender 3.6–4.5"
+    ]
+  },
+  {
+    "href": "https://superhivemarket.com/products/isometric-room-generator",
+    "img": "https://assets.superhivemarket.com/cache/af9e9b8a5b31fb6b079b116b78f1ccd5.png",
+    "title": "IRG — Isometric Room Generator",
+    "sub": "Generate square/round rooms + windows in seconds.",
+    "tags": [
+      "Isometric",
+      "Windows"
+    ]
+  },
+  {
+    "href": "https://superhivemarket.com/products/key-capture",
+    "img": "https://assets.superhivemarket.com/cache/f191b28230006e8ecfecb21dc44d0bfe.gif",
+    "title": "Key Capture",
+    "sub": "Show keys & mouse live in the viewport for tutorials.",
+    "tags": [
+      "Teaching",
+      "HUD"
+    ]
+  },
+  {
+    "href": "https://superhivemarket.com/products/maze-maker",
+    "img": "https://assets.superhivemarket.com/cache/5ab8e4f8c67678fe4eee5c26a0077211.png",
+    "title": "Maze Maker",
+    "sub": "Procedural mazes, rooms, loop probability + BFS path.",
+    "tags": [
+      "Procedural",
+      "Path"
+    ]
+  }
+]
