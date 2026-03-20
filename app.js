@@ -389,9 +389,9 @@ const Blocks = {
     label: '⚖️ Before & After',
     desc: 'Side-by-side images',
     defaults: ()=>({
-      leftImg: 'https://assets.superhivemarket.com/cache/5f525fcc03dd92e5709598c769bd480d.jpg',
+      leftImg: 'https://picsum.photos/800/600?blur=4&random=12',
       leftLabel: 'Without Addon',
-      rightImg: 'https://assets.superhivemarket.com/cache/d49a5fb485d53d2f3605b9c3c1665e04.jpg',
+      rightImg: 'https://picsum.photos/800/600?random=12',
       rightLabel: 'With Addon',
       baseSurfaceStyle: 'margin:0 0 18px 0;',
       style:''
@@ -598,30 +598,209 @@ const Blocks = {
 
   ctaBanner: {
     label:'📢 CTA Banner',
-    desc:'Headline + sub + image',
-    defaults:()=>({
-      headline:'Match your scene to your mood.',
-      sub:'Transform images into immersive lighting setups with one click.',
-      image:'https://assets.superhivemarket.com/cache/879c0e355fea9942235109ad46c0aa85.jpg',
-      gif:'https://assets.superhivemarket.com/cache/6ff9f473c367245e682100801c184cd9.gif',
-      baseSurfaceStyle:'margin:0 0 18px 0;background:#1b2451;color:#eaf0ff;border-radius:16px;padding:16px;border:1px solid rgba(255,255,255,.15);',
-      style:'',
-
-      bg:'',
-      color:'',
-}),
-    render:(p)=>`
+    desc: 'Call to action box',
+    defaults: ()=>({
+      title: 'Ready to upgrade your workflow?',
+      btn: 'Get Addon Now',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:64px 24px; background:linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius:16px; text-align:center; color:#fff;',
+      style:''
+    }),
+    render: (p)=> `
       <div class="block" data-type="ctaBanner">
-        <div data-surface="1" style="${mergeSurfaceStyle(p)}">
-          <div>
-            <div style="font-weight:700;font-size:18px;">${html(p.headline)}</div>
-            <div style="font-size:16px;">${html(p.sub)}</div>
-            <div style="margin:10px 0;"><img src="${attr(p.image)}" style="max-width:100%;"></div>
-            <div><b>Create palette templates from reference images.</b><br>Quickly save and recall previous image palettes.</div>
-            <div style="margin-top:10px;"><img src="${attr(p.gif)}" style="max-width:100%;"></div>
-          </div>
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="font-size:32px; font-weight:800; margin:0 0 32px 0;">${html(p.title)}</h2>
+          <a href="#" style="display:inline-block; padding:16px 32px; background:#fff; color:#1d4ed8; font-weight:800; font-size:18px; border-radius:8px; text-decoration:none;">${html(p.btn)}</a>
         </div>
       </div>`
+  },
+
+  glossyCards: {
+    label: '✨ Glass Cards',
+    desc: 'Glossy glassmorphism grid',
+    defaults: ()=>({
+      title: 'Premium Features',
+      glassTint: 'rgba(255,255,255,0.05)',
+      glowColor: 'rgba(37,99,235,0.3)',
+      cols: '3',
+      cards: [
+        { icon:'🔥', title:'Blazing Fast', desc:'Optimized for extreme performance.' },
+        { icon:'🎨', title:'Stunning UI', desc:'Build gorgeous interfaces easily.' },
+        { icon:'⚡', title:'Real-time', desc:'Changes sync instantly.' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:48px 24px; background:#0f111a; border-radius:16px; overflow:hidden; position:relative;',
+      style:''
+    }),
+    render: (p)=> {
+      const grid = p.cards.map(c => `
+        <div style="background:${p.glassTint}; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:32px; text-align:center; position:relative; z-index:2; box-shadow:0 4px 30px rgba(0,0,0,0.1);">
+          <div style="font-size:40px; margin-bottom:16px; filter:drop-shadow(0 0 12px ${p.glowColor});">${html(c.icon)}</div>
+          <h3 style="margin:0 0 12px 0; font-size:20px; font-weight:700; color:#fff;">${html(c.title)}</h3>
+          <p style="margin:0; font-size:15px; color:#cbd5e1; line-height:1.6;">${html(c.desc)}</p>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="glossyCards">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:60%; height:60%; background:${p.glowColor}; filter:blur(100px); border-radius:50%; z-index:0; opacity:0.6; pointer-events:none;"></div>
+          <h2 style="text-align:center; font-size:32px; font-weight:800; color:#fff; margin:0 0 40px 0; position:relative; z-index:2;">${html(p.title)}</h2>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(${p.cols==='2'?'400px':'250px'}, 1fr)); gap:24px; position:relative; z-index:2;">
+            ${grid}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  neonShowcase: {
+    label: '🟩 Neon Showcase',
+    desc: 'Image/Video frame with neon border',
+    defaults: ()=>({
+      title: 'Watch the Trailer',
+      neonColor: '#0ea5e9',
+      image: 'https://picsum.photos/800/450?random=10',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:64px 24px; background:#050505; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      return `
+      <div class="block" data-type="neonShowcase">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <h2 style="text-align:center; font-size:32px; font-weight:800; color:#fff; margin:0 0 48px 0; text-shadow:0 0 20px ${p.neonColor};">${html(p.title)}</h2>
+          <div style="max-width:800px; margin:0 auto; position:relative;">
+            <div style="position:absolute; inset:-4px; background:${p.neonColor}; filter:blur(24px); opacity:0.8; border-radius:16px;"></div>
+            <div style="position:absolute; inset:-1px; background:${p.neonColor}; border-radius:12px;"></div>
+            <img src="${attr(p.image)}" style="width:100%; height:auto; display:block; border-radius:12px; position:relative; z-index:2; border:1px solid rgba(255,255,255,0.1);" />
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  animatedMarquee: {
+    label: '🔁 Auto Marquee',
+    desc: 'Scrolling infinite text tape',
+    defaults: ()=>({
+      text: 'HIGH PERFORMANCE • STUNNING VISUALS • INSTANT FEEDBACK • SEAMLESS INTEGRATION • ',
+      bgColor: '#2563eb',
+      textColor: '#ffffff',
+      speed: '20s',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:24px 0; overflow:hidden; position:relative; transform:rotate(-2deg) scale(1.05);',
+      style:''
+    }),
+    render: (p)=> {
+      const id = 'mq_' + Math.random().toString(36).substr(2,9);
+      return `
+      <div class="block" data-type="animatedMarquee">
+        <style>
+          @keyframes anim_${id} { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        </style>
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}; background:${p.bgColor};">
+          <div style="display:flex; width:200%; animation:anim_${id} ${p.speed} linear infinite;">
+            <div style="flex:1; white-space:nowrap; font-size:48px; font-weight:900; color:${p.textColor}; padding:0 24px; text-transform:uppercase; letter-spacing:2px;">${html(p.text)}</div>
+            <div style="flex:1; white-space:nowrap; font-size:48px; font-weight:900; color:${p.textColor}; padding:0 24px; text-transform:uppercase; letter-spacing:2px;">${html(p.text)}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  cyberStats: {
+    label: '📊 Cyber Stats',
+    desc: 'High-tech angled stats',
+    defaults: ()=>({
+      accent: '#f43f5e',
+      stats: [
+        { val:'99%', label:'Uptime' },
+        { val:'10x', label:'Faster' },
+        { val:'24/7', label:'Support' }
+      ],
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:64px 24px; background:#000000; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const st = p.stats.map(s => `
+        <div style="flex:1; min-width:200px; padding:32px 24px; background:#0a0a0a; border:1px solid #1a1a1a; border-left:4px solid ${p.accent}; border-radius:4px; text-align:center; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; right:0; width:30px; height:30px; background:linear-gradient(45deg, transparent 50%, ${p.accent} 50%); opacity:0.5;"></div>
+          <div style="font-size:56px; font-weight:900; color:#fff; line-height:1; margin-bottom:8px; font-family:monospace; text-shadow:0 0 12px ${p.accent};">${html(s.val)}</div>
+          <div style="font-size:14px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:2px;">${html(s.label)}</div>
+        </div>
+      `).join('');
+      return `
+      <div class="block" data-type="cyberStats">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="display:flex; flex-wrap:wrap; gap:24px; justify-content:center; align-items:stretch;">
+            ${st}
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  splitReveal: {
+    label: '🌗 Split Reveal',
+    desc: 'Diagonal split comparison concept',
+    defaults: ()=>({
+      leftImg: 'https://picsum.photos/800/600?blur=2&random=11',
+      rightImg: 'https://picsum.photos/800/600?random=11',
+      leftLabel: 'Standard',
+      rightLabel: 'Pro Addon',
+      lineColor: '#eab308',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:0; border-radius:16px; overflow:hidden; position:relative; aspect-ratio:16/9; min-height:400px;',
+      style:''
+    }),
+    render: (p)=> {
+      return `
+      <div class="block" data-type="splitReveal">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="position:absolute; inset:0; background:url('${attr(p.leftImg)}') center/cover no-repeat;"></div>
+          <div style="position:absolute; inset:0; background:url('${attr(p.rightImg)}') center/cover no-repeat; clip-path:polygon(50% 0, 100% 0, 100% 100%, 30% 100%);"></div>
+          <div style="position:absolute; inset:0; pointer-events:none;">
+            <svg width="100%" height="100%" preserveAspectRatio="none" style="position:absolute; inset:0;">
+              <line x1="50%" y1="0" x2="30%" y2="100%" stroke="${p.lineColor}" stroke-width="4"></line>
+            </svg>
+            <div style="position:absolute; top:24px; left:24px; background:rgba(0,0,0,0.7); color:#fff; padding:6px 16px; border-radius:24px; font-weight:700; font-size:14px; backdrop-filter:blur(4px);">${html(p.leftLabel)}</div>
+            <div style="position:absolute; bottom:24px; right:24px; background:${p.lineColor}; color:#000; padding:6px 16px; border-radius:24px; font-weight:800; font-size:14px; box-shadow:0 10px 20px rgba(0,0,0,0.3);">${html(p.rightLabel)}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  },
+
+  featureSpotlight: {
+    label: '✨ Big Spotlight',
+    desc: 'Watermark background with skewed box',
+    defaults: ()=>({
+      watermark: 'PRO',
+      title: 'Unleash Your Creativity',
+      accent: '#a855f7',
+      bullets: ['Advanced Node Groups', 'Real-time syncing', 'One-click exports', 'PBR Materials'],
+      image: 'https://picsum.photos/600/600?random=15',
+      baseSurfaceStyle: 'margin:0 0 18px 0; padding:80px 24px; background:#0f172a; position:relative; overflow:hidden; border-radius:16px;',
+      style:''
+    }),
+    render: (p)=> {
+      const lis = p.bullets.map(b => `<li style="margin-bottom:12px; display:flex; align-items:center; gap:12px;"><div style="width:8px; height:8px; border-radius:50%; background:${p.accent}; box-shadow:0 0 10px ${p.accent};"></div>${html(b)}</li>`).join('');
+      return `
+      <div class="block" data-type="featureSpotlight">
+        <div data-surface="1" style="${attr(mergeSurfaceStyle(p))}">
+          <div style="position:absolute; top:50%; left:0; transform:translateY(-50%); font-size:300px; font-weight:900; color:rgba(255,255,255,0.03); line-height:1; letter-spacing:-10px; pointer-events:none; font-family:sans-serif; white-space:nowrap;">${html(p.watermark)}</div>
+          
+          <div style="max-width:1000px; margin:0 auto; display:flex; flex-wrap:wrap; gap:48px; align-items:center; position:relative; z-index:2;">
+            <div style="flex:1; min-width:300px;">
+              <h2 style="font-size:40px; font-weight:800; color:#fff; margin:0 0 24px 0; line-height:1.2;">${html(p.title)}</h2>
+              <ul style="list-style:none; padding:0; margin:0; font-size:18px; color:#cbd5e1; font-weight:500;">
+                ${lis}
+              </ul>
+            </div>
+            <div style="flex:1; min-width:300px; text-align:center; position:relative;">
+              <div style="position:absolute; inset:10px -10px -10px 10px; background:${p.accent}; transform:skew(-5deg); border-radius:16px; opacity:0.5; filter:blur(20px);"></div>
+              <div style="position:absolute; inset:10px -10px -10px 10px; background:${p.accent}; transform:skew(-5deg); border-radius:16px; border:2px solid rgba(255,255,255,0.2);"></div>
+              <img src="${attr(p.image)}" style="width:100%; border-radius:16px; position:relative; z-index:2; transform:skew(-5deg) scale(0.95); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);" />
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
   },
 
   bentoGrid: {
@@ -1294,10 +1473,18 @@ function updateInspector(){
   const st = sel?.props || {};
   $('#st-margin').value = readCSS(st.style,'margin');
   $('#st-padding').value = readCSS(st.style,'padding');
-  $('#st-bg').value      = readCSS(st.style,'background');
+
+  const bgVal = readCSS(st.style,'background');
+  $('#st-bg').value = bgVal;
+  if (bgVal.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-bg-picker').value = bgVal;
+
   $('#st-border').value  = readCSS(st.style,'border');
   $('#st-radius').value  = readCSS(st.style,'border-radius');
-  $('#st-color').value   = readCSS(st.style,'color');
+
+  const colVal = readCSS(st.style,'color');
+  $('#st-color').value = colVal;
+  if (colVal.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-color-picker').value = colVal;
+
   $('#st-inline').value  = inlineRemainder(st.style, ['margin','padding','background','border','border-radius','color']);
   $('#blk-name').value   = sel?.name || '';
   $('#blk-visible').value = (sel?.hidden ? 'hidden' : '');
@@ -1565,12 +1752,74 @@ function updateInspector(){
   if(sel.type==='raw'){
     f.appendChild(textarea('Raw HTML', sel.props.html,(v)=>{ sel.props.html=v; render(); }));
   }
+
+  if(sel.type==='glossyCards'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(field('Glass Tint','text',sel.props.glassTint,(v)=>{ sel.props.glassTint=v; render(); }));
+    f.appendChild(field('Glow Color','text',sel.props.glowColor,(v)=>{ sel.props.glowColor=v; render(); }));
+    f.appendChild(field('Grid Columns','text',sel.props.cols,(v)=>{ sel.props.cols=v; render(); }));
+    f.appendChild(arrayEditor('Cards', ['icon','title','desc'], sel.props.cards, (a)=>{ sel.props.cards=a; render(); }));
+  }
+
+  if(sel.type==='neonShowcase'){
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(field('Neon Color','text',sel.props.neonColor,(v)=>{ sel.props.neonColor=v; render(); }));
+    f.appendChild(field('Image/Video URL','text',sel.props.image,(v)=>{ sel.props.image=v; render(); }));
+  }
+
+  if(sel.type==='animatedMarquee'){
+    f.appendChild(field('Text','text',sel.props.text,(v)=>{ sel.props.text=v; render(); }));
+    f.appendChild(field('Background Color','text',sel.props.bgColor,(v)=>{ sel.props.bgColor=v; render(); }));
+    f.appendChild(field('Text Color','text',sel.props.textColor,(v)=>{ sel.props.textColor=v; render(); }));
+    f.appendChild(field('Speed (e.g. 20s)','text',sel.props.speed,(v)=>{ sel.props.speed=v; render(); }));
+  }
+
+  if(sel.type==='cyberStats'){
+    f.appendChild(field('Accent Color','text',sel.props.accent,(v)=>{ sel.props.accent=v; render(); }));
+    f.appendChild(arrayEditor('Stats', ['val','label'], sel.props.stats, (a)=>{ sel.props.stats=a; render(); }));
+  }
+
+  if(sel.type==='splitReveal'){
+    f.appendChild(field('Left Image','text',sel.props.leftImg,(v)=>{ sel.props.leftImg=v; render(); }));
+    f.appendChild(field('Right Image','text',sel.props.rightImg,(v)=>{ sel.props.rightImg=v; render(); }));
+    f.appendChild(field('Left Label','text',sel.props.leftLabel,(v)=>{ sel.props.leftLabel=v; render(); }));
+    f.appendChild(field('Right Label','text',sel.props.rightLabel,(v)=>{ sel.props.rightLabel=v; render(); }));
+    f.appendChild(field('Line Color','text',sel.props.lineColor,(v)=>{ sel.props.lineColor=v; render(); }));
+  }
+
+  if(sel.type==='featureSpotlight'){
+    f.appendChild(field('Watermark Text','text',sel.props.watermark,(v)=>{ sel.props.watermark=v; render(); }));
+    f.appendChild(field('Title','text',sel.props.title,(v)=>{ sel.props.title=v; render(); }));
+    f.appendChild(field('Accent Color','text',sel.props.accent,(v)=>{ sel.props.accent=v; render(); }));
+    f.appendChild(field('Image URL','text',sel.props.image,(v)=>{ sel.props.image=v; render(); }));
+    f.appendChild(textarea('Bullets (comma separated)',sel.props.bullets.join(', '),(v)=>{ sel.props.bullets=v.split(',').map(s=>s.trim()); render(); }));
+  }
 }
 
 function field(label, type, value, on){
   const d = document.createElement('div'); d.className='field';
-  d.innerHTML = `<label>${label}</label><input type="${type}" value="${attr(value)}"/>`;
-  d.querySelector('input').addEventListener('input', e=> on(e.target.value));
+  const isColor = label.toLowerCase().match(/(color|bg|background|tint|accent)/i);
+  
+  if (isColor) {
+    const hex = (value && typeof value === 'string' && value.match(/^#[0-9A-Fa-f]{6}$/)) ? value : '#000000';
+    const colorBox = `<input type="color" value="${hex}" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />`;
+    d.innerHTML = `<label>${label}</label><div style="display:flex; gap:6px;"><input type="${type}" value="${attr(value)}" style="flex:1;"/>${colorBox}</div>`;
+    
+    const textInp = d.querySelector(`input[type="${type}"]`);
+    const colInp = d.querySelector('input[type="color"]');
+    
+    textInp.addEventListener('input', e=> {
+      if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) { colInp.value = e.target.value; }
+      on(e.target.value);
+    });
+    colInp.addEventListener('input', e=> {
+      textInp.value = e.target.value;
+      on(e.target.value);
+    });
+  } else {
+    d.innerHTML = `<label>${label}</label><input type="${type}" value="${attr(value)}"/>`;
+    d.querySelector('input').addEventListener('input', e=> on(e.target.value));
+  }
   return d;
 }
 function textarea(label, value, on){
@@ -1752,10 +2001,28 @@ $('#btn-down').onclick = ()=>{
 /* style inputs -> live */
 $('#st-margin').addEventListener('input', rebuildStyle);
 $('#st-padding').addEventListener('input', rebuildStyle);
-$('#st-bg').addEventListener('input', rebuildStyle);
+
+$('#st-bg').addEventListener('input', e => {
+  if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-bg-picker').value = e.target.value;
+  rebuildStyle();
+});
+$('#st-bg-picker').addEventListener('input', e => {
+  $('#st-bg').value = e.target.value;
+  rebuildStyle();
+});
+
 $('#st-border').addEventListener('input', rebuildStyle);
 $('#st-radius').addEventListener('input', rebuildStyle);
-$('#st-color').addEventListener('input', rebuildStyle);
+
+$('#st-color').addEventListener('input', e => {
+  if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) $('#st-color-picker').value = e.target.value;
+  rebuildStyle();
+});
+$('#st-color-picker').addEventListener('input', e => {
+  $('#st-color').value = e.target.value;
+  rebuildStyle();
+});
+
 $('#st-inline').addEventListener('input', rebuildStyle);
 
 $('#blk-name').addEventListener('input', e=>{ 

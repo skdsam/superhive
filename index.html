@@ -73,7 +73,10 @@
         <div class="row">
           <div class="field">
             <label>Background</label>
-            <input id="st-bg" placeholder="#ffffff or gradient"/>
+            <div style="display:flex; gap:6px;">
+              <input id="st-bg" placeholder="#ffffff or gradient" style="flex:1;"/>
+              <input type="color" id="st-bg-picker" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />
+            </div>
           </div>
           <div class="field">
             <label>Border</label>
@@ -87,7 +90,10 @@
           </div>
           <div class="field">
             <label>Color</label>
-            <input id="st-color" placeholder="#0f1220"/>
+            <div style="display:flex; gap:6px;">
+              <input id="st-color" placeholder="#0f1220" style="flex:1;"/>
+              <input type="color" id="st-color-picker" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />
+            </div>
           </div>
         </div>
         <div class="field">
