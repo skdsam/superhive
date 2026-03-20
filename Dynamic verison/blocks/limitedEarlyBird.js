@@ -9,6 +9,7 @@ export default {
     accentColor: '#3b82f6',
     bgColor: '#ffffff',
     textColor: '#1f2937',
+    badgeTextColor: '#ffffff',
     baseSurfaceStyle: 'margin:32px 0;',
     style: ''
   }),
@@ -45,7 +46,7 @@ export default {
         .eb-limit-badge {
           display: inline-block;
           background: ${attr(p.accentColor)};
-          color: white;
+          color: ${attr(p.badgeTextColor)};
           padding: 8px 24px;
           border-radius: 12px;
           font-weight: 800;
