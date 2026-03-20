@@ -65,11 +65,22 @@ header.appbar #btn-global-addons:hover { background: #eff6ff; }
   margin-top: 4px; z-index: 200;
 }
 .dropdown:hover .dropdown-menu { display: block; }
-.dropdown-menu a {
-  display: block; padding: 10px 12px; font-size: 13px; color: var(--text);
-  text-decoration: none; border-radius: 6px; transition: background 0.1s;
+.dropdown-menu a, .dropdown-menu button {
+    display: block;
+    padding: 10px 14px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
 }
-.dropdown-menu a:hover { background: var(--panel2); color: var(--accent); }
+.dropdown-menu a:hover, .dropdown-menu button:hover {
+    background: var(--bg-soft);
+    color: var(--accent);
+}
 
 .toggle-btn {
   background: transparent; border: 1px solid var(--border); border-radius: 6px;

@@ -535,6 +535,7 @@ $('#import-do').onclick = ()=>{
 $('#btn-export').onclick = ()=> exportHTML();
 $('#btn-bg-variants').onclick = ()=> openBGVariants();
 $('#btn-copy').onclick = ()=> copyExportHTML();
+$('#btn-global-addons').onclick = ()=> openGlobalAddonsModal();
 
 function buildLoadList(){
   const list = JSON.parse(localStorage.getItem('sh_templates')||'[]');
@@ -677,10 +678,28 @@ function openBGVariants(){
     const it = document.createElement('div');
     it.className = 'bg-item';
     it.innerHTML = `<div class="swatch" style="background:${v.css}"></div><div class="meta"><div>${v.name}</div><code>${v.css}</code></div>`;
-    const btn = document.createElement('button');
-    btn.textContent = 'Use';
-    btn.onclick = ()=>{ $('#st-bg').value=v.css; rebuildStyle(); closeModal('modal-bg'); };
-    it.querySelector('.meta').appendChild(btn);
+    
+    const useBtn = document.createElement('button');
+    useBtn.textContent = 'Use';
+    useBtn.onclick = ()=>{ $('#st-bg').value=v.css; rebuildStyle(); closeModal('modal-bg'); };
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy';
+    copyBtn.onclick = async ()=>{
+      try { await navigator.clipboard.writeText(v.css); alert('CSS Copied!'); }
+      catch(e) { prompt('Copy this:', v.css); }
+    };
+    
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'bg-btns';
+    btnContainer.style.marginTop = "8px";
+    btnContainer.style.display = "flex";
+    btnContainer.style.gap = "6px";
+    
+    btnContainer.appendChild(useBtn);
+    btnContainer.appendChild(copyBtn);
+    
+    it.querySelector('.meta').appendChild(btnContainer);
     grid.appendChild(it);
   });
   openModal('modal-bg');
@@ -709,6 +728,8 @@ function tryRestore(){
 
 function openModal(id){ $('#'+id).style.display='flex'; }
 function closeModal(id){ $('#'+id).style.display='none'; }
+window.openModal = openModal;
+window.closeModal = closeModal;
 
 // Shortcut listeners
 window.addEventListener('keydown', (e)=>{

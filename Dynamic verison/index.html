@@ -14,15 +14,31 @@
     </button>
     <div class="title">🧩 SuperHive Add-on Page Builder</div>
     <div class="spacer"></div>
-    <button class="btn" id="btn-new">New</button>
-    <button class="btn" id="btn-save">Save Template</button>
-    <button class="btn" id="btn-load">Load Template</button>
-    <button class="btn" id="btn-import">Import HTML</button>
-    <button class="btn" id="btn-export">Export HTML</button>
-    <button class="btn" id="btn-copy">Copy HTML</button> 
-    <button class="btn" id="btn-bg-variants">BG Variants</button>
     <div class="dropdown">
-      <button class="btn dropdown-toggle">Emoji Helpers ⚡</button>
+      <button class="btn">Project ▾</button>
+      <div class="dropdown-menu">
+        <button id="btn-new">New Page</button>
+        <button id="btn-save">Save Template</button>
+        <button id="btn-load">Load Template</button>
+        <hr style="margin: 4px 0; border: 0; border-top: 1px solid var(--border);">
+        <button id="btn-global-addons">Global Addons Template</button>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn">Export ▾</button>
+      <div class="dropdown-menu">
+        <button id="btn-copy">Copy HTML</button>
+        <button id="btn-export">Download HTML</button>
+        <hr style="margin: 4px 0; border: 0; border-top: 1px solid var(--border);">
+        <button id="btn-import">Import HTML</button>
+      </div>
+    </div>
+
+    <button class="btn" id="btn-bg-variants">BG Variants Library</button>
+    
+    <div class="dropdown">
+      <button class="btn">Emoji Helpers ▾</button>
       <div class="dropdown-menu">
         <a href="https://getemoji.com/" target="_blank">GetEmoji.com</a>
         <a href="https://emojipedia.org/" target="_blank">Emojipedia</a>
@@ -30,7 +46,6 @@
         <a href="https://copyandpasteemoji.com/" target="_blank">Copy & Paste Emoji</a>
       </div>
     </div>
-    <button class="btn" id="btn-global-addons" style="border-color:var(--accent); color:var(--text);">Global Addons Template</button>
     <button class="toggle-btn" id="btn-toggle-right" title="Toggle Inspector (R)" style="margin-left:8px;">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
     </button>
