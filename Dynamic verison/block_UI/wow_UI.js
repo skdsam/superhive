@@ -1,7 +1,12 @@
 export default (f, p, render, { field, select, textarea }) => {
     f.appendChild(field('Badge Text','text',p.badge,(v)=>{ p.badge=v; render(); }));
+    f.appendChild(field('Badge Text Color','color',p.badgeTextColor || '#ffffff',(v)=>{ p.badgeTextColor=v; render(); }));
+    
     f.appendChild(field('Headline','text',p.title,(v)=>{ p.title=v; render(); }));
+    f.appendChild(field('Headline Color','color',p.titleColor || '#ffffff',(v)=>{ p.titleColor=v; render(); }));
+    
     f.appendChild(textarea('Description',p.desc,(v)=>{ p.desc=v; render(); }));
+    f.appendChild(field('Description Color','color',p.descColor || '#cbd5e1',(v)=>{ p.descColor=v; render(); }));
     
     f.appendChild(select('Wow Theme', p.theme, [
         { label: 'Neon Blue', value: 'neon-blue' },
