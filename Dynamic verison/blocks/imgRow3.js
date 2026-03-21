@@ -10,6 +10,11 @@ export default {
       'https://assets.superhivemarket.com/cache/d49a5fb485d53d2f3605b9c3c1665e04.jpg',
       'https://assets.superhivemarket.com/cache/0cd9ee6fc0d0d7194b2f202c5ac8b86b.JPG'
     ],
+    links: [
+      '',
+      '',
+      ''
+    ],
     baseSurfaceStyle: 'margin:0 0 18px 0;',
     style: ''
   }),
@@ -17,6 +22,7 @@ export default {
     const cols = p.itemsPerRow || 3;
     const gap = p.gap !== undefined ? p.gap : 12;
     const ratio = p.aspectRatio || '16/9';
+    const links = p.links || [];
     
     // Using grid with explicit columns to respect itemsPerRow, 
     // while ensuring they are fluid via 1fr.
@@ -29,11 +35,16 @@ export default {
     return `
     <div class="block" data-type="imgRow3">
       <div data-surface="1" style="${gridStyle} ${mergeSurfaceStyle(p)}">
-        ${p.imgs.map(src => `
-          <div style="width:100%; aspect-ratio: ${ratio}; overflow:hidden; border-radius:12px;">
-            <img src="${attr(src)}" style="width:100%; height:100%; object-fit:cover; display:block;">
-          </div>
-        `).join('')}
+        ${p.imgs.map((src, idx) => {
+          const l = links[idx] || '';
+          const tag = l ? 'a' : 'div';
+          const hrefAttr = l ? `href="${attr(l)}" target="_blank" rel="noopener"` : '';
+          return `
+            <${tag} ${hrefAttr} style="display:block; width:100%; aspect-ratio: ${ratio}; overflow:hidden; border-radius:12px; border:none; text-decoration:none;">
+              <img src="${attr(src)}" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </${tag}>
+          `;
+        }).join('')}
       </div>
     </div>`;
   }

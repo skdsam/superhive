@@ -44,12 +44,13 @@ export function select(label, value, options, on) {
   return d;
 }
 
-export function addCountControls(container, label, count, onChange) {
+export function addCountControls(container, label, count, onChange, updateInspectorCb) {
   const wrap = document.createElement('div'); wrap.className='field';
   wrap.innerHTML = `<label>${label} (count)</label><input type="number" min="0" value="${count}">`;
   wrap.querySelector('input').addEventListener('input', e=>{
     const n = Math.max(0, parseInt(e.target.value||'0',10));
     onChange(n);
+    if(updateInspectorCb) updateInspectorCb();
   });
   container.appendChild(wrap);
 }

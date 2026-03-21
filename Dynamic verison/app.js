@@ -109,7 +109,7 @@ const shHelpers = {
   textarea: (...args) => shUI.textarea(...args), 
   select: (...args) => shUI.select(...args),
   arrayEditor: (...args) => shUI.arrayEditor(...args, updateInspector), 
-  addCountControls: (...args) => shUI.addCountControls(...args), 
+  addCountControls: (...args) => shUI.addCountControls(...args, updateInspector), 
   ensureLength: (...args) => shUI.ensureLength(...args), 
   openGlobalAddonsModal: (...args) => openGlobalAddonsModal(...args) 
 };
