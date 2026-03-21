@@ -1,4 +1,4 @@
-export default (f, p, render, { field, select, addCountControls, ensureLength }) => {
+animatedMarquee export default (f, p, render, { field, select, addCountControls, ensureLength }) => {
     const rowWrap = document.createElement('div');
     rowWrap.className = 'row';
     rowWrap.appendChild(field('Items Per Row','number',p.itemsPerRow||3,(v)=>{ p.itemsPerRow=Math.max(1,parseInt(v)||1); render(); }));

@@ -8,7 +8,7 @@ export default (f, p, render, { field, select }) => {
     f.appendChild(field('Vertical Padding (px)','number',p.padding,(v)=>{ p.padding=v; render(); }));
     
     // Select for Reverse and Pause on Hover
-    const boolOptions = [{l:'Yes',v:true}, {l:'No',v:false}];
+    const boolOptions = [{label:'Yes',value:true}, {label:'No',value:false}];
     f.appendChild(select('Reverse Direction', p.reverse, boolOptions, (v)=>{ p.reverse = (v === 'true' || v === true); render(); }));
     f.appendChild(select('Pause on Hover', p.pauseOnHover, boolOptions, (v)=>{ p.pauseOnHover = (v === 'true' || v === true); render(); }));
   };
