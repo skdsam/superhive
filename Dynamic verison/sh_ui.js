@@ -16,18 +16,10 @@ export function field(label, type, value, on) {
   
   if (isColor) {
     const hex = (value && typeof value === 'string' && value.match(/^#[0-9A-Fa-f]{6}$/)) ? value : '#000000';
-    const colorBox = `<input type="color" value="${hex}" style="width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;" />`;
-    d.innerHTML = `<label>${label}</label><div style="display:flex; gap:6px;"><input type="${type}" value="${attr(value)}" style="flex:1;"/>${colorBox}</div>`;
+    d.innerHTML = `<label>${label}</label><input type="color" value="${hex}" style="width:100%; height:28px; padding:0; border:none; border-radius:4px; background:none; cursor:pointer;" />`;
     
-    const textInp = d.querySelector(`input[type="${type}"]`);
     const colInp = d.querySelector('input[type="color"]');
-    
-    textInp.addEventListener('input', e=> {
-      if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) { colInp.value = e.target.value; }
-      on(e.target.value);
-    });
     colInp.addEventListener('input', e=> {
-      textInp.value = e.target.value;
       on(e.target.value);
     });
   } else {
@@ -109,27 +101,13 @@ export function arrayEditor(label, keys, arr, onChange, updateInspector) {
         onChange(arr); 
       };
 
-      inpWrap.appendChild(inp);
-
       if (isColor && !isLarge) {
-        const hex = (item[k] && typeof item[k] === 'string' && item[k].match(/^#[0-9A-Fa-f]{6}$/)) ? item[k] : '#000000';
-        const colInp = document.createElement('input');
-        colInp.type = 'color';
-        colInp.value = hex;
-        colInp.style.cssText = 'width:28px; height:28px; padding:0; border:none; background:none; cursor:pointer;';
-        colInp.oninput = (e) => {
-          inp.value = e.target.value;
-          item[k] = e.target.value;
-          onChange(arr);
-        };
-        // Update color box when text input changes
-        const oldOnInput = inp.oninput;
-        inp.oninput = (e) => {
-          oldOnInput(e);
-          if(e.target.value.match(/^#[0-9A-Fa-f]{6}$/)) colInp.value = e.target.value;
-        };
-        inpWrap.appendChild(colInp);
+        inp.type = 'color';
+        inp.value = (item[k] && typeof item[k] === 'string' && item[k].match(/^#[0-9A-Fa-f]{6}$/)) ? item[k] : '#000000';
+        inp.style.cssText = 'width:100%; height:28px; padding:0; border:none; border-radius:4px; background:none; cursor:pointer;';
       }
+      
+      inpWrap.appendChild(inp);
       
       row.appendChild(klabel); row.appendChild(inpWrap);
       card.appendChild(row);
