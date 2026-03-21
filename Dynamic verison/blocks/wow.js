@@ -3,8 +3,11 @@ export default {
   desc: 'Eye-catching feature showcase',
   defaults: () => ({
     badge: 'NEW UPDATE',
+    badgeTextColor: '#ffffff',
     title: 'Meet Geometry Nodes 2.0',
+    titleColor: '#ffffff',
     desc: 'A completely rewritten computational framework that gives you full node-based control over the asset generation pipeline.',
+    descColor: '#cbd5e1',
     theme: 'neon-blue',
     layout: 'center-stacked',
     showEmoji: true,
@@ -26,6 +29,9 @@ export default {
     };
     const t = themes[p.theme] || themes['neon-blue'];
     const layout = p.layout || 'center-stacked';
+    const bColor = p.badgeTextColor || t.badgeText || '#ffffff';
+    const tColor = p.titleColor || t.text || '#ffffff';
+    const dColor = p.descColor || t.text || '#ffffff';
     const showEmoji = p.showEmoji !== false;
     const emoji = p.emoji || '✨';
 
@@ -43,36 +49,36 @@ export default {
     if (layout === 'center-stacked') {
       innerHtml = `
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
-            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
-            <p style="margin:0 auto; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8;">${html(p.desc)}</p>
+            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${bColor}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em; color:${tColor};">${html(p.title)}</h2>
+            <p style="margin:0 auto; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8; color:${dColor};">${html(p.desc)}</p>
             ${iconHtml}
           </div>`;
     } else if (layout === 'left-aligned') {
       innerHtml = `
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-start; text-align:left;">
-            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
-            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
-            <p style="margin:0; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8;">${html(p.desc)}</p>
+            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${bColor}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em; color:${tColor};">${html(p.title)}</h2>
+            <p style="margin:0; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8; color:${dColor};">${html(p.desc)}</p>
             <div style="width:100%; display:flex; justify-content:flex-start; transform: translateX(-10px);">${iconHtml}</div>
           </div>`;
     } else if (layout === 'right-aligned') {
       innerHtml = `
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-end; text-align:right;">
-            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
-            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
-            <p style="margin:0; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8;">${html(p.desc)}</p>
+            <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${bColor}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+            <h2 style="margin:0 0 16px 0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em; color:${tColor};">${html(p.title)}</h2>
+            <p style="margin:0; font-size:18px; line-height:1.6; max-width:580px; opacity:0.8; color:${dColor};">${html(p.desc)}</p>
             <div style="width:100%; display:flex; justify-content:flex-end; transform: translateX(10px);">${iconHtml}</div>
           </div>`;
     } else if (layout === 'split-row') {
       innerHtml = `
           <div style="position:relative; z-index:1; display:flex; flex-direction:row; align-items:center; text-align:left; flex-wrap:wrap; gap:48px;">
             <div style="flex:1.2; min-width:320px; align-self:center;">
-              <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${t.badgeText}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
-              <h2 style="margin:0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em;">${html(p.title)}</h2>
+              <span style="display:inline-block; padding:6px 14px; border-radius:999px; background:${t.badgeBg}; color:${bColor}; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:24px;">${html(p.badge)}</span>
+              <h2 style="margin:0; font-size:42px; font-weight:900; line-height:1.1; letter-spacing:-0.03em; color:${tColor};">${html(p.title)}</h2>
             </div>
             <div style="flex:1; min-width:320px;">
-              <p style="margin:0; font-size:18px; line-height:1.6; opacity:0.8;">${html(p.desc)}</p>
+              <p style="margin:0; font-size:18px; line-height:1.6; opacity:0.8; color:${dColor};">${html(p.desc)}</p>
               <div style="width:100%; display:flex; justify-content:flex-start;">${iconHtml}</div>
             </div>
           </div>`;
