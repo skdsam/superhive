@@ -418,12 +418,18 @@ $('#btn-down').onclick = ()=>{
   const i=state.blocks.findIndex(b=>b.id===sel.id);
   if(i<state.blocks.length-1){ [state.blocks[i+1],state.blocks[i]]=[state.blocks[i],state.blocks[i+1]]; render(); selectBlock(sel.id);}
 };
-$('#btn-del').onclick = ()=>{
-  const sel=getSelected(); if(!sel) return;
-  if(confirm('Delete selection?')){
+$('#btn-del').onclick = () => {
+  if(!getSelected()) return;
+  openModal('modal-delete-block');
+};
+
+$('#confirm-delete-block-do').onclick = () => {
+  const sel = getSelected();
+  if(sel) {
     state.blocks = state.blocks.filter(b=>b.id!==sel.id);
     state.selectedId=null; render();
   }
+  closeModal('modal-delete-block');
 };
 
 /* -------------------------
@@ -509,6 +515,14 @@ $('#save-file-do').onclick = ()=>{
   const name=$('#save-name').value.trim() || 'template';
   downloadJSON(state.blocks, `superhive_layout_${name.toLowerCase().replace(/\s+/g, '_')}.json`);
   closeModal('modal-save');
+};
+
+$('#btn-clear').onclick = () => openModal('modal-confirm');
+$('#confirm-clear-do').onclick = () => {
+  state.blocks = [];
+  state.selectedId = null;
+  render();
+  closeModal('modal-confirm');
 };
 
 $('#btn-load').onclick = ()=>{ openModal('modal-load'); buildLoadList(); };
@@ -657,8 +671,24 @@ $('#export-global-addons-btn').onclick = ()=> downloadJSON(tempGlobalAddons, 'sh
 $('#import-global-addons-btn').onclick = ()=> uploadJSON(j => { tempGlobalAddons=j; renderGlobalAddonsModalFields(); });
 
 /* -------------------------
+   Top Bar Actions
+------------------------- */
+$('#btn-new').onclick = () => openModal('modal-new-page');
+$('#confirm-new-page-do').onclick = () => { loadDefault(); closeModal('modal-new-page'); };
+$('#btn-save').onclick = () => { openModal('modal-save'); $('#save-name').value = `Template ${new Date().toLocaleString()}`; };
+$('#btn-load').onclick = () => { openModal('modal-load'); buildLoadList(); };
+$('#btn-clear').onclick = () => openModal('modal-confirm');
+$('#confirm-clear-do').onclick = () => { state.blocks=[]; render(); closeModal('modal-confirm'); };
+$('#btn-import').onclick = () => openModal('modal-import');
+$('#btn-copy').onclick = copyExportHTML;
+$('#btn-export').onclick = exportHTML;
+
+/* -------------------------
    Background Variants
 ------------------------- */
+$('#btn-bg-variants').onclick = () => openBGVariants();
+$('#btn-global-addons').onclick = () => openModal('modal-global-addons');
+
 const BG_VARIANTS = [
   { name: 'Pure White', css: '#ffffff' },
   { name: 'Eggshell', css: '#f8fafc' },

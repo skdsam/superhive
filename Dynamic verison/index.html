@@ -18,6 +18,7 @@
       <button class="btn">Project ▾</button>
       <div class="dropdown-menu">
         <button id="btn-new">New Page</button>
+        <button id="btn-clear" style="color:red">White Sheet</button>
         <button id="btn-save">Save Template</button>
         <button id="btn-load">Load Template</button>
         <hr style="margin: 4px 0; border: 0; border-top: 1px solid var(--border);">
@@ -103,7 +104,10 @@
         <div class="row">
           <div class="field">
             <label>Background</label>
-            <input type="color" id="st-bg-picker" style="width:100%; height:28px; padding:0; border:none; border-radius:4px; background:none; cursor:pointer;" />
+            <div style="display:flex;gap:4px;">
+              <input type="color" id="st-bg-picker" style="flex:1; height:28px; padding:0; border:none; border-radius:4px; background:none; cursor:pointer;" />
+              <button id="btn-bg-variants" class="tool" title="Gradients & more">✨</button>
+            </div>
             <input id="st-bg" style="display:none;" />
           </div>
           <div class="field">
@@ -213,5 +217,59 @@
 
   <!-- App logic -->
   <script src="app.js" type="module" defer></script>
+  <!-- Delete Block Modal -->
+  <div id="modal-delete-block" class="modal">
+    <div class="modal-content glass-modal animate-in">
+      <div class="modal-header">
+        <h3>Delete Block?</h3>
+        <button class="close-btn" onclick="closeModal('modal-delete-block')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-icon">🗑️</div>
+        <p>Are you sure you want to delete this block? This cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('modal-delete-block')">Cancel</button>
+        <button id="confirm-delete-block-do" class="btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Page Modal -->
+  <div id="modal-new-page" class="modal">
+    <div class="modal-content glass-modal animate-in">
+      <div class="modal-header">
+        <h3>Start New Page?</h3>
+        <button class="close-btn" onclick="closeModal('modal-new-page')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-icon">📄</div>
+        <p>This will reset your workspace and start with a fresh template. Unsaved changes will be lost.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('modal-new-page')">Cancel</button>
+        <button id="confirm-new-page-do" class="btn-danger" style="background:var(--accent); border-color:var(--accent);">Start New Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="modal-confirm" class="modal">
+    <div class="modal-content glass-modal animate-in">
+      <div class="modal-header">
+        <h3>Clear Canvas?</h3>
+        <button class="close-btn" onclick="closeModal('modal-confirm')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-icon">⚠️</div>
+        <p>This will permanently remove all blocks from your current collection. This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('modal-confirm')">Cancel</button>
+        <button id="confirm-clear-do" class="btn-danger">Clear Everything</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
