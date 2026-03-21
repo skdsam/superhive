@@ -660,16 +660,27 @@ $('#import-global-addons-btn').onclick = ()=> uploadJSON(j => { tempGlobalAddons
    Background Variants
 ------------------------- */
 const BG_VARIANTS = [
-  { name:'Deep Navy', css:'#0f1220' },
-  { name:'Midnight',  css:'#0b0f19' },
-  { name:'Obsidian Slate', css:'linear-gradient(135deg, #232526 0%, #414345 100%)' },
-  { name:'Synthwave', css:'linear-gradient(135deg, #130cb7 0%, #5218fa 100%)' },
-  { name:'Deep Space', css:'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' },
-  { name:'Blender UI', css:'linear-gradient(135deg, #353535 0%, #212121 100%)' },
-  { name:'Blender Orange', css:'linear-gradient(135deg, #e87b28 0%, #c45700 100%)' },
-  { name:'Cyber Pink', css:'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)' },
-  { name:'Obsidian Prism', css:'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)), #050608' },
+  { name: 'Pure White', css: '#ffffff' },
+  { name: 'Eggshell', css: '#f8fafc' },
+  { name: 'Pure Dark', css: '#0f1220' },
+  { name: 'Dark Blue', css: 'linear-gradient(135deg, #0f1220 0%, #1e1b4b 100%)' },
+  { name: 'Indigo Night', css: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' },
+  { name: 'Deep Space', css: '#0b0e14' },
+  { name: 'Midnight Storm', css: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' },
+  { name: 'Aurora Borealis', css: 'radial-gradient(at 20% 20%, rgba(34, 197, 94, 0.1) 0px, transparent 50%), radial-gradient(at 80% 80%, rgba(59, 130, 246, 0.1) 0px, transparent 50%), linear-gradient(to bottom, #020617, #0f172a)' },
+  { name: 'Dark Grid', css: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px), #0f1220', style: 'background-size: 32px 32px, 32px 32px;' },
+  { name: 'Blue Cyber Grid', css: 'linear-gradient(rgba(56,189,248,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.1) 1px, transparent 1px), #0f172a', style: 'background-size: 40px 40px, 40px 40px;' },
+  { name: 'Mesh Gradient', css: 'radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%), #0f172a' },
+  { name: 'Blueprint Grid', css: 'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px), #1e40af', style: 'background-size: 20px 20px, 20px 20px;' },
+  { name: 'Dotted Paper', css: 'radial-gradient(#cbd5e1 1px, transparent 0), #f8fafc', style: 'background-size: 20px 20px;' },
+  { name: 'Glass Frost', css: 'rgba(255,255,255,0.05)', style: 'backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);' },
+  { name: 'Sunset Glow', css: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
+  { name: 'Oceanic', css: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)' },
+  { name: 'Emerald', css: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
+  { name: 'Grid Mesh', css: 'linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px), radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%), linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', style: 'background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;' },
+  { name: 'Royal Gold', css: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)', style: 'border-left: 4px solid #eab308;' }
 ];
+
 
 function openBGVariants(){
   const grid = $('#bg-variants-grid');
@@ -677,17 +688,23 @@ function openBGVariants(){
   BG_VARIANTS.forEach(v=>{
     const it = document.createElement('div');
     it.className = 'bg-item';
-    it.innerHTML = `<div class="swatch" style="background:${v.css}"></div><div class="meta"><div>${v.name}</div><code>${v.css}</code></div>`;
+    it.innerHTML = `<div class="swatch" style="background:${v.css}; ${v.style||''}"></div><div class="meta"><div>${v.name}</div><code>${v.css}</code></div>`;
     
     const useBtn = document.createElement('button');
     useBtn.textContent = 'Use';
-    useBtn.onclick = ()=>{ $('#st-bg').value=v.css; rebuildStyle(); closeModal('modal-bg'); };
+    useBtn.onclick = ()=>{ 
+      $('#st-bg').value=v.css; 
+      if(v.style) $('#st-inline').value = v.style + ' ' + $('#st-inline').value;
+      rebuildStyle(); 
+      closeModal('modal-bg'); 
+    };
     
     const copyBtn = document.createElement('button');
     copyBtn.textContent = 'Copy';
     copyBtn.onclick = async ()=>{
-      try { await navigator.clipboard.writeText(v.css); alert('CSS Copied!'); }
-      catch(e) { prompt('Copy this:', v.css); }
+      const fullCSS = `background: ${v.css}; ${v.style||''}`;
+      try { await navigator.clipboard.writeText(fullCSS); alert('CSS Copied!'); }
+      catch(e) { prompt('Copy this:', fullCSS); }
     };
     
     const btnContainer = document.createElement('div');
@@ -704,6 +721,7 @@ function openBGVariants(){
   });
   openModal('modal-bg');
 }
+
 
 /* -------------------------
    Boot
