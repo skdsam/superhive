@@ -10,6 +10,8 @@ export default {
       'World Background Syncing',
       'Cycles & Eevee Support'
     ],
+    bulletIcon: '✔',
+    bulletColor: '#2a3566',
     baseSurfaceStyle:'margin:0 0 18px 0;background:#f6f7fb;border:1px solid #e2e6f4;border-radius:14px;padding:16px;',
     style:''
   }),
@@ -18,7 +20,7 @@ export default {
       <div class="sh-card-soft" data-surface="1" style="${mergeSurfaceStyle(p)}">
         <div style="font-weight:700;margin-bottom:8px;">${html(p.title)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#394067;">
-          ${p.bullets.map(b=>`<div><span style="color:#2a3566;margin-right:4px;">✔</span>${html(b)}</div>`).join('')}
+          ${p.bullets.map(b=>`<div><span style="color:${p.bulletColor || '#2a3566'};margin-right:4px;">${p.bulletIcon || '✔'}</span>${html(b)}</div>`).join('')}
         </div>
       </div>
     </div>`
